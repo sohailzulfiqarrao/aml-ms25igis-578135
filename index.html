@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Sohail Zulfiqar | Applied Machine Learning, Fall 2026</title>
+   <meta name="description" content="Assignments for the Applied Machine Learning course, MS Remote Sensing and GIS, NUST IGIS: Python notebooks, scikit-learn and statsmodels.">
+   <meta property="og:title" content="Applied Machine Learning, Fall 2026 | Sohail Zulfiqar">
+   <meta property="og:description" content="Multiple linear regression on satellite and climate data to predict evapotranspiration over Islamabad.">
+   <meta property="og:image" content="https://sohailzulfiqarrao.github.io/aml-ms25igis-578135/Assignments/Assignment%201/images/correlation-matrix.png">
+   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a2f4f'/%3E%3Cpath d='M7 23l6-7 5 4 7-11' fill='none' stroke='%23e3a72f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+   <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="masthead">
+   <div class="wrap">
+      <img class="logo" src="assets/nust-logo.jpg" alt="NUST logo: Defining futures">
+      <div class="titles">
+         <h1>Applied Machine Learning</h1>
+         <p class="sub">Fall 2026 &middot; MS Remote Sensing and GIS</p>
+      </div>
+   </div>
+</header>
+
+<main>
+   <section class="wrap profile" aria-label="Student">
+      <dl>
+         <div class="item"><dt>Student</dt><dd>Sohail Zulfiqar</dd></div>
+         <div class="item"><dt>Registration ID</dt><dd>578135</dd></div>
+         <div class="item"><dt>Program</dt><dd>MS GIS &amp; RS, 2025</dd></div>
+         <div class="item"><dt>Instructor</dt><dd>Hammad Gilani</dd></div>
+      </dl>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="assignments-title">Assignments</h2>
+      <p class="section-note">Each assignment has a results page, a written report and a Python notebook.</p>
+   </div>
+
+   <section class="wrap cards" aria-labelledby="assignments-title">
+
+      <article class="card assignment1">
+         <a class="thumb plot" href="Assignments/Assignment%201/" tabindex="-1" aria-hidden="true">
+            <img src="Assignments/Assignment%201/images/correlation-matrix.png" width="854" height="690" loading="lazy" alt="">
+         </a>
+         <div class="body">
+            <p class="meta"><span class="badge">Assignment 01</span> Multiple linear regression</p>
+            <h3>Predicting Evapotranspiration over Islamabad</h3>
+            <p>
+               Evapotranspiration modelled from satellite-derived vegetation indices and climate variables for the
+               Islamabad Capital Territory: 87 observations, a missing-data and outlier audit, VIF pruning, then a
+               regression checked on a held-out test set and with 5-fold cross-validation.
+            </p>
+            <p class="extras">
+               Test R&sup2; 0.785 (RMSE 1.78 mm); cross-validated mean R&sup2; 0.704. Seven predictors kept after
+               pruning EVI.
+            </p>
+            <ul class="tags" aria-label="Topics">
+               <li>Python</li><li>scikit-learn</li><li>statsmodels</li><li>VIF</li><li>Cross-validation</li>
+            </ul>
+            <div class="actions">
+               <a class="button" href="Assignments/Assignment%201/">Open page</a>
+               <a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/report.md">Report</a>
+               <a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/Islamabd_MLR_Assignment.ipynb">Notebook</a>
+            </div>
+         </div>
+      </article>
+
+      <article class="card upcoming" aria-label="Upcoming assignment">
+         <div>
+            <strong>More assignments to come</strong>
+            New assignments will be added here during the semester.
+         </div>
+      </article>
+
+   </section>
+</main>
+
+<footer>
+   <div class="wrap">
+      <p>Applied Machine Learning &middot; Fall 2026 &middot; Institute of Geographical Information Systems, School of
+         Civil and Environmental Engineering, National University of Sciences and Technology, Islamabad.</p>
+      <p style="flex: 0 1 auto"><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135">Repository</a></p>
+   </div>
+</footer>
+
+</body>
+</html>

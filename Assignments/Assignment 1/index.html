@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Assignment 1 | Predicting Evapotranspiration over Islamabad</title>
+   <meta name="description" content="Multiple linear regression predicting evapotranspiration over Islamabad from satellite-derived vegetation indices and climate variables: 87 observations, VIF pruning, test-set and 5-fold cross-validated scores.">
+   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a2f4f'/%3E%3Cpath d='M7 23l6-7 5 4 7-11' fill='none' stroke='%23e3a72f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+   <link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+
+<header class="masthead">
+   <div class="wrap">
+      <img class="logo" src="../../assets/nust-logo.jpg" alt="NUST logo: Defining futures">
+      <div class="titles">
+         <h1>Assignment 1</h1>
+         <p class="sub">Multiple linear regression &middot; Applied Machine Learning, Fall 2026</p>
+      </div>
+   </div>
+</header>
+
+<main>
+   <p class="wrap crumb"><a href="../../">&larr; All assignments</a></p>
+
+   <section class="wrap profile" aria-label="Student">
+      <dl>
+         <div class="item"><dt>Student</dt><dd>Sohail Zulfiqar</dd></div>
+         <div class="item"><dt>Registration ID</dt><dd>578135</dd></div>
+         <div class="item"><dt>Program</dt><dd>MS GIS &amp; RS, 2025</dd></div>
+         <div class="item"><dt>Instructor</dt><dd>Hammad Gilani</dd></div>
+      </dl>
+   </section>
+
+   <section class="wrap profile results" aria-label="Results">
+      <dl>
+         <div class="item"><dt>Observations</dt><dd>87<small>8 candidate predictors</small></dd></div>
+         <div class="item"><dt>Predictors kept</dt><dd>7<small>EVI pruned, VIF 17.9</small></dd></div>
+         <div class="item"><dt>Test R&sup2;</dt><dd>0.785<small>RMSE 1.78 mm, 18 rows</small></dd></div>
+         <div class="item"><dt>5-fold CV R&sup2;</dt><dd>0.704<small>mean, &plusmn;0.087</small></dd></div>
+      </dl>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="aim-title">Objective and data</h2>
+   </div>
+   <section class="wrap prose" aria-labelledby="aim-title">
+      <p>
+         Predict surface evapotranspiration, <code>ET_mm</code>, across the Islamabad Capital Territory from
+         satellite-derived vegetation indices and climate variables, using multiple linear regression. The dataset
+         has 87 observations and eight candidate predictors.
+      </p>
+      <div class="panel table-wrap">
+         <table class="data text">
+            <thead><tr><th>Variable</th><th>Role</th><th>Meaning</th></tr></thead>
+            <tbody>
+               <tr><td><code>ET_mm</code></td><td>Target</td><td>Evapotranspiration, mm</td></tr>
+               <tr><td><code>NDVI</code></td><td>Predictor</td><td>Normalized Difference Vegetation Index</td></tr>
+               <tr><td><code>EVI</code></td><td>Predictor</td><td>Enhanced Vegetation Index (pruned for collinearity)</td></tr>
+               <tr><td><code>LAI</code></td><td>Predictor</td><td>Leaf Area Index</td></tr>
+               <tr><td><code>LST_Day_C</code></td><td>Predictor</td><td>Daytime land surface temperature, &deg;C</td></tr>
+               <tr><td><code>T2m_C</code></td><td>Predictor</td><td>Air temperature at 2 m, &deg;C</td></tr>
+               <tr><td><code>Prec_mm</code></td><td>Predictor</td><td>Precipitation, mm</td></tr>
+               <tr><td><code>SoilM_L1_vfrac</code></td><td>Predictor</td><td>Soil moisture, layer 1, volume fraction</td></tr>
+               <tr><td><code>Wind10m_ms</code></td><td>Predictor</td><td>Wind speed at 10 m, m/s</td></tr>
+            </tbody>
+         </table>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="method-title">Method</h2>
+      <p class="section-note">The steps of the notebook, in order.</p>
+   </div>
+   <section class="wrap" aria-labelledby="method-title">
+      <div class="panel">
+         <ol class="steps">
+            <li><strong>Completeness audit.</strong> All 87 rows are complete: no nulls and no sentinel values.</li>
+            <li><strong>Outliers.</strong> IQR fences (1.5 &times; IQR) flag values in five predictors: LAI 10, wind 5, daytime LST 2, precipitation 1 and 2 m temperature 1. They are capped at the fence rather than dropped, so all 87 rows are kept.</li>
+            <li><strong>Correlation and VIF.</strong> NDVI, EVI and LAI are strongly correlated (EVI&ndash;NDVI r = 0.95). EVI has a VIF of 17.9 and is removed; NDVI falls from 30.0 to 9.2 and LAI from 11.3 to 11.1.</li>
+            <li><strong>Split and scaling.</strong> An 80/20 split (69 training rows, 18 test rows, seed 42). Predictors are z-score scaled with a scaler fitted on the training rows only.</li>
+            <li><strong>Fit and evaluate.</strong> Ordinary least squares, scored on both partitions and with 5-fold shuffled cross-validation.</li>
+            <li><strong>Inference.</strong> The same model refitted with statsmodels on the 69 training rows for coefficients, p-values and residual diagnostics.</li>
+         </ol>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="results-title">Results</h2>
+   </div>
+   <section class="wrap" aria-labelledby="results-title">
+      <div class="panel table-wrap">
+         <h3>Train and test scores</h3>
+         <table class="data">
+            <thead><tr><th>Partition</th><th class="num">MAE</th><th class="num">MSE</th><th class="num">RMSE</th><th class="num">R&sup2;</th><th class="num">Adj. R&sup2;</th><th class="num">MAPE %</th></tr></thead>
+            <tbody>
+               <tr><td>Training (69 rows)</td><td class="num">1.0052</td><td class="num">2.2436</td><td class="num">1.4979</td><td class="num">0.8147</td><td class="num">0.7934</td><td class="num">10.99</td></tr>
+               <tr class="key"><td>Testing (18 rows)</td><td class="num">0.9740</td><td class="num">3.1649</td><td class="num">1.7790</td><td class="num">0.7850</td><td class="num">0.6345</td><td class="num">9.07</td></tr>
+            </tbody>
+         </table>
+      </div>
+
+      <div class="panel table-wrap">
+         <h3>5-fold cross-validation</h3>
+         <table class="data">
+            <thead><tr><th>Fold</th><th class="num">R&sup2;</th><th class="num">RMSE (mm)</th></tr></thead>
+            <tbody>
+               <tr><td>Fold 1</td><td class="num">0.7850</td><td class="num">1.7790</td></tr>
+               <tr><td>Fold 2</td><td class="num">0.5754</td><td class="num">1.9830</td></tr>
+               <tr><td>Fold 3</td><td class="num">0.6963</td><td class="num">1.9620</td></tr>
+               <tr><td>Fold 4</td><td class="num">0.8124</td><td class="num">1.7098</td></tr>
+               <tr><td>Fold 5</td><td class="num">0.6498</td><td class="num">1.7678</td></tr>
+               <tr class="key"><td>Mean (&plusmn; std)</td><td class="num">0.7038 (&plusmn;0.0870)</td><td class="num">1.8403 (&plusmn;0.1106)</td></tr>
+            </tbody>
+         </table>
+      </div>
+
+      <div class="panel table-wrap">
+         <h3>Fitted equation and predictors</h3>
+<pre class="equation">ET_mm = 12.8571 - 0.0712(LAI) - 0.1171(LST_Day_C) + 16.8534(NDVI) - 0.0012(Prec_mm)
+        + 14.2934(SoilM_L1_vfrac) - 0.9464(T2m_C) + 6.7701(Wind10m_ms)</pre>
+         <table class="data">
+            <thead><tr><th>Predictor</th><th class="num">Coefficient</th><th class="num">Standardized &beta;</th><th class="num">p-value</th><th class="num">VIF</th></tr></thead>
+            <tbody>
+               <tr class="key"><td>NDVI</td><td class="num">16.8534</td><td class="num">2.4528</td><td class="num">&lt; 0.001</td><td class="num">9.17</td></tr>
+               <tr class="key"><td>SoilM_L1_vfrac</td><td class="num">14.2934</td><td class="num">0.6685</td><td class="num">0.034</td><td class="num">2.52</td></tr>
+               <tr><td>T2m_C</td><td class="num">-0.9464</td><td class="num">-0.6042</td><td class="num">0.155</td><td class="num">4.74</td></tr>
+               <tr><td>Wind10m_ms</td><td class="num">6.7701</td><td class="num">0.2130</td><td class="num">0.336</td><td class="num">1.41</td></tr>
+               <tr><td>Prec_mm</td><td class="num">-0.0012</td><td class="num">-0.1806</td><td class="num">0.658</td><td class="num">4.52</td></tr>
+               <tr><td>LST_Day_C</td><td class="num">-0.1171</td><td class="num">-0.1690</td><td class="num">0.712</td><td class="num">3.99</td></tr>
+               <tr><td>LAI</td><td class="num">-0.0712</td><td class="num">-0.0316</td><td class="num">0.964</td><td class="num">11.06</td></tr>
+            </tbody>
+         </table>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="figures-title">Figures</h2>
+      <p class="section-note">Outputs of the notebook, not redrawn.</p>
+   </div>
+   <section class="wrap figures" aria-labelledby="figures-title">
+      <figure>
+         <img src="images/correlation-matrix.png" width="854" height="690" loading="lazy" alt="Correlation matrix heatmap of evapotranspiration and the eight predictors">
+         <figcaption><strong>Correlation matrix.</strong> NDVI, EVI and LAI are strongly correlated with each other (0.88 to 0.95) and with ET (0.85 to 0.89).</figcaption>
+      </figure>
+      <figure>
+         <img src="images/residuals-vs-fitted.png" width="690" height="490" loading="lazy" alt="Residuals plotted against predicted evapotranspiration on the test set">
+         <figcaption><strong>Residuals against fitted values.</strong> The homoscedasticity check on the test set: residuals stay within about &plusmn;0.8 mm below 11 mm predicted, then the largest ones appear (about 6.5 mm and 3.1 mm).</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/vif-comparison.png" width="1389" height="490" loading="lazy" alt="Two bar charts of variance inflation factors before and after pruning EVI, with a threshold line at 10">
+         <figcaption><strong>Multicollinearity.</strong> VIF for each predictor before and after pruning EVI, against the threshold of 10.</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/model-evaluation.png" width="1389" height="490" loading="lazy" alt="Observed against predicted evapotranspiration on the test set with a 1:1 line, beside a histogram of the residuals">
+         <figcaption><strong>Model fit.</strong> Observed against predicted ET on the test set (left) and the distribution of the residuals (right).</figcaption>
+      </figure>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="notes-title">Reading the diagnostics</h2>
+   </div>
+   <section class="wrap" aria-labelledby="notes-title">
+      <div class="panel note">
+         <ul class="steps">
+            <li><strong>Collinearity is reduced, not removed.</strong> LAI still has a VIF of 11.06, above the notebook's threshold of 10, and NDVI is at 9.17. Only NDVI and soil moisture are significant at the 5% level.</li>
+            <li><strong>Residuals are not normal.</strong> In the statsmodels fit on the training rows, the Jarque&ndash;Bera test gives p = 0.0035 and the omnibus test p = 0.024. The Durbin&ndash;Watson statistic is 2.10, so there is no sign of autocorrelation, and the condition number is 9.4.</li>
+            <li><strong>Small test set.</strong> The 18 test rows give R&sup2; 0.785, but the five folds range from 0.58 to 0.81. Fold 1 reproduces the test-set scores exactly (0.7850 and 1.7790 mm), so the CV mean is the steadier figure.</li>
+         </ul>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="run-title">Run the notebook</h2>
+      <p class="section-note">Three ways to work with it.</p>
+   </div>
+   <section class="wrap how" aria-labelledby="run-title">
+      <div class="item">
+         <h3>Read it on GitHub</h3>
+         <p>GitHub renders the notebook with its code, output and plots.</p>
+         <p><a class="button" href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/Islamabd_MLR_Assignment.ipynb">Open notebook</a></p>
+      </div>
+      <div class="item">
+         <h3>Run it in Colab</h3>
+         <p>Google Colab already has pandas, scikit-learn and Matplotlib. Upload <code>Islamabad_Data.csv</code> to the session first, since the notebook reads it from its working folder.</p>
+         <p><a class="button" href="https://colab.research.google.com/github/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/Islamabd_MLR_Assignment.ipynb">Open in Colab</a>
+            &nbsp;<a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/Islamabad_Data.csv">Islamabad_Data.csv</a></p>
+      </div>
+      <div class="item">
+         <h3>Run it locally</h3>
+         <p>Clone the repository, then from the <code>Assignment 1</code> folder:</p>
+<pre>pip install notebook pandas scikit-learn matplotlib seaborn statsmodels tabulate
+jupyter notebook</pre>
+      </div>
+   </section>
+</main>
+
+<footer>
+   <div class="wrap">
+      <p>Applied Machine Learning &middot; Fall 2026 &middot; Institute of Geographical Information Systems, School of
+         Civil and Environmental Engineering, National University of Sciences and Technology, Islamabad.</p>
+      <p style="flex: 0 1 auto"><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%201/report.md">Report</a> &middot;
+         <a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135">Repository</a></p>
+   </div>
+</footer>
+
+</body>
+</html>
