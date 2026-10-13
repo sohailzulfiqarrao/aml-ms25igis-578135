@@ -58,9 +58,9 @@ and upload the CSV to the session first.
 
 ## Publish updates
 
-`first_push.bat` created the `main` branch and set the remote once. After that, `commit.bat` stages everything,
-commits as "Updating coursework" and pushes. Lecture slides, the in-class notebooks and other course files are kept
-out of the repository by `.gitignore`.
+Updates are pushed with a local `commit.bat` that stages everything, commits as "Updating coursework" and pushes. It
+is listed in `.gitignore`, so it stays on the local machine. Lecture slides, the in-class notebooks and other course
+files are kept out of the repository by `.gitignore` too.
 
 ---
 **Author:** Sohail Zulfiqar, MS GIS & Remote Sensing
