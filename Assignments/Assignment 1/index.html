@@ -28,16 +28,16 @@
          <div class="item"><dt>Student</dt><dd>Sohail Zulfiqar</dd></div>
          <div class="item"><dt>Registration ID</dt><dd>578135</dd></div>
          <div class="item"><dt>Program</dt><dd>MS GIS &amp; RS, 2025</dd></div>
-         <div class="item"><dt>Instructor</dt><dd>Hammad Gilani</dd></div>
+         <div class="item"><dt>Instructor</dt><dd>Dr Hammad Gilani</dd></div>
       </dl>
    </section>
 
    <section class="wrap profile results" aria-label="Results">
       <dl>
          <div class="item"><dt>Observations</dt><dd>87<small>8 candidate predictors</small></dd></div>
-         <div class="item"><dt>Predictors kept</dt><dd>7<small>EVI pruned, VIF 17.9</small></dd></div>
+         <div class="item"><dt>Predictors kept</dt><dd>6<small>EVI and LAI pruned, max VIF 4.7</small></dd></div>
          <div class="item"><dt>Test R&sup2;</dt><dd>0.785<small>RMSE 1.78 mm, 18 rows</small></dd></div>
-         <div class="item"><dt>5-fold CV R&sup2;</dt><dd>0.704<small>mean, &plusmn;0.087</small></dd></div>
+         <div class="item"><dt>5-fold CV R&sup2;</dt><dd>0.724<small>mean, &plusmn;0.087</small></dd></div>
       </dl>
    </section>
 
@@ -77,7 +77,7 @@
          <ol class="steps">
             <li><strong>Completeness audit.</strong> All 87 rows are complete: no nulls and no sentinel values.</li>
             <li><strong>Outliers.</strong> IQR fences (1.5 &times; IQR) flag values in five predictors: LAI 10, wind 5, daytime LST 2, precipitation 1 and 2 m temperature 1. They are capped at the fence rather than dropped, so all 87 rows are kept.</li>
-            <li><strong>Correlation and VIF.</strong> NDVI, EVI and LAI are strongly correlated (EVI&ndash;NDVI r = 0.95). EVI has a VIF of 17.9 and is removed; NDVI falls from 30.0 to 9.2 and LAI from 11.3 to 11.1.</li>
+            <li><strong>Correlation and VIF.</strong> NDVI, EVI and LAI are strongly correlated (EVI&ndash;NDVI r = 0.95). EVI (VIF 17.9) is removed first, because NDVI correlates more strongly with ET (0.89 against 0.85). NDVI then falls from 30.0 to 9.2, but LAI stays at 11.1, so a loop removes it too. All six remaining predictors are below 5.</li>
             <li><strong>Split and scaling.</strong> An 80/20 split (69 training rows, 18 test rows, seed 42). Predictors are z-score scaled with a scaler fitted on the training rows only.</li>
             <li><strong>Fit and evaluate.</strong> Ordinary least squares, scored on both partitions and with 5-fold shuffled cross-validation.</li>
             <li><strong>Inference.</strong> The same model refitted with statsmodels on the 69 training rows for coefficients, p-values and residual diagnostics.</li>
@@ -94,8 +94,8 @@
          <table class="data">
             <thead><tr><th>Partition</th><th class="num">MAE</th><th class="num">MSE</th><th class="num">RMSE</th><th class="num">R&sup2;</th><th class="num">Adj. R&sup2;</th><th class="num">MAPE %</th></tr></thead>
             <tbody>
-               <tr><td>Training (69 rows)</td><td class="num">1.0052</td><td class="num">2.2436</td><td class="num">1.4979</td><td class="num">0.8147</td><td class="num">0.7934</td><td class="num">10.99</td></tr>
-               <tr class="key"><td>Testing (18 rows)</td><td class="num">0.9740</td><td class="num">3.1649</td><td class="num">1.7790</td><td class="num">0.7850</td><td class="num">0.6345</td><td class="num">9.07</td></tr>
+               <tr><td>Training (69 rows)</td><td class="num">1.0055</td><td class="num">2.2437</td><td class="num">1.4979</td><td class="num">0.8147</td><td class="num">0.7968</td><td class="num">10.98</td></tr>
+               <tr class="key"><td>Testing (18 rows)</td><td class="num">0.9730</td><td class="num">3.1604</td><td class="num">1.7778</td><td class="num">0.7853</td><td class="num">0.6682</td><td class="num">9.05</td></tr>
             </tbody>
          </table>
       </div>
@@ -105,30 +105,29 @@
          <table class="data">
             <thead><tr><th>Fold</th><th class="num">R&sup2;</th><th class="num">RMSE (mm)</th></tr></thead>
             <tbody>
-               <tr><td>Fold 1</td><td class="num">0.7850</td><td class="num">1.7790</td></tr>
-               <tr><td>Fold 2</td><td class="num">0.5754</td><td class="num">1.9830</td></tr>
-               <tr><td>Fold 3</td><td class="num">0.6963</td><td class="num">1.9620</td></tr>
-               <tr><td>Fold 4</td><td class="num">0.8124</td><td class="num">1.7098</td></tr>
-               <tr><td>Fold 5</td><td class="num">0.6498</td><td class="num">1.7678</td></tr>
-               <tr class="key"><td>Mean (&plusmn; std)</td><td class="num">0.7038 (&plusmn;0.0870)</td><td class="num">1.8403 (&plusmn;0.1106)</td></tr>
+               <tr><td>Fold 1</td><td class="num">0.7853</td><td class="num">1.7778</td></tr>
+               <tr><td>Fold 2</td><td class="num">0.5992</td><td class="num">1.9265</td></tr>
+               <tr><td>Fold 3</td><td class="num">0.7009</td><td class="num">1.9470</td></tr>
+               <tr><td>Fold 4</td><td class="num">0.8528</td><td class="num">1.5144</td></tr>
+               <tr><td>Fold 5</td><td class="num">0.6833</td><td class="num">1.6812</td></tr>
+               <tr class="key"><td>Mean (&plusmn; std)</td><td class="num">0.7243 (&plusmn;0.0873)</td><td class="num">1.7694 (&plusmn;0.1607)</td></tr>
             </tbody>
          </table>
       </div>
 
       <div class="panel table-wrap">
          <h3>Fitted equation and predictors</h3>
-<pre class="equation">ET_mm = 12.8571 - 0.0712(LAI) - 0.1171(LST_Day_C) + 16.8534(NDVI) - 0.0012(Prec_mm)
-        + 14.2934(SoilM_L1_vfrac) - 0.9464(T2m_C) + 6.7701(Wind10m_ms)</pre>
+<pre class="equation">ET_mm = 12.6693 - 0.1104(LST_Day_C) + 16.7041(NDVI) - 0.0012(Prec_mm)
+        + 14.3144(SoilM_L1_vfrac) - 0.9457(T2m_C) + 6.7737(Wind10m_ms)</pre>
          <table class="data">
             <thead><tr><th>Predictor</th><th class="num">Coefficient</th><th class="num">Standardized &beta;</th><th class="num">p-value</th><th class="num">VIF</th></tr></thead>
             <tbody>
-               <tr class="key"><td>NDVI</td><td class="num">16.8534</td><td class="num">2.4528</td><td class="num">&lt; 0.001</td><td class="num">9.17</td></tr>
-               <tr class="key"><td>SoilM_L1_vfrac</td><td class="num">14.2934</td><td class="num">0.6685</td><td class="num">0.034</td><td class="num">2.52</td></tr>
-               <tr><td>T2m_C</td><td class="num">-0.9464</td><td class="num">-0.6042</td><td class="num">0.155</td><td class="num">4.74</td></tr>
-               <tr><td>Wind10m_ms</td><td class="num">6.7701</td><td class="num">0.2130</td><td class="num">0.336</td><td class="num">1.41</td></tr>
-               <tr><td>Prec_mm</td><td class="num">-0.0012</td><td class="num">-0.1806</td><td class="num">0.658</td><td class="num">4.52</td></tr>
-               <tr><td>LST_Day_C</td><td class="num">-0.1171</td><td class="num">-0.1690</td><td class="num">0.712</td><td class="num">3.99</td></tr>
-               <tr><td>LAI</td><td class="num">-0.0712</td><td class="num">-0.0316</td><td class="num">0.964</td><td class="num">11.06</td></tr>
+               <tr class="key"><td>NDVI</td><td class="num">16.7041</td><td class="num">2.4311</td><td class="num">&lt; 0.001</td><td class="num">2.99</td></tr>
+               <tr class="key"><td>SoilM_L1_vfrac</td><td class="num">14.3144</td><td class="num">0.6694</td><td class="num">0.032</td><td class="num">2.52</td></tr>
+               <tr><td>T2m_C</td><td class="num">-0.9457</td><td class="num">-0.6038</td><td class="num">0.151</td><td class="num">4.69</td></tr>
+               <tr><td>Wind10m_ms</td><td class="num">6.7737</td><td class="num">0.2131</td><td class="num">0.332</td><td class="num">1.40</td></tr>
+               <tr><td>Prec_mm</td><td class="num">-0.0012</td><td class="num">-0.1811</td><td class="num">0.654</td><td class="num">4.52</td></tr>
+               <tr><td>LST_Day_C</td><td class="num">-0.1104</td><td class="num">-0.1593</td><td class="num">0.690</td><td class="num">3.50</td></tr>
             </tbody>
          </table>
       </div>
@@ -145,11 +144,11 @@
       </figure>
       <figure>
          <img src="images/residuals-vs-fitted.png" width="690" height="490" loading="lazy" alt="Residuals plotted against predicted evapotranspiration on the test set">
-         <figcaption><strong>Residuals against fitted values.</strong> The homoscedasticity check on the test set: residuals stay within about &plusmn;0.8 mm below 11 mm predicted, then the largest ones appear (about 6.5 mm and 3.1 mm).</figcaption>
+         <figcaption><strong>Residuals against fitted values.</strong> The homoscedasticity check on the test set: residuals stay within about &plusmn;0.8 mm below 11 mm predicted, then the largest ones appear (about 6.4 mm and 3.1 mm).</figcaption>
       </figure>
       <figure class="wide">
          <img src="images/vif-comparison.png" width="1389" height="490" loading="lazy" alt="Two bar charts of variance inflation factors before and after pruning EVI, with a threshold line at 10">
-         <figcaption><strong>Multicollinearity.</strong> VIF for each predictor before and after pruning EVI, against the threshold of 10.</figcaption>
+         <figcaption><strong>Multicollinearity.</strong> VIF for each predictor before and after pruning EVI and LAI, against the threshold of 10.</figcaption>
       </figure>
       <figure class="wide">
          <img src="images/model-evaluation.png" width="1389" height="490" loading="lazy" alt="Observed against predicted evapotranspiration on the test set with a 1:1 line, beside a histogram of the residuals">
@@ -163,9 +162,9 @@
    <section class="wrap" aria-labelledby="notes-title">
       <div class="panel note">
          <ul class="steps">
-            <li><strong>Collinearity is reduced, not removed.</strong> LAI still has a VIF of 11.06, above the notebook's threshold of 10, and NDVI is at 9.17. Only NDVI and soil moisture are significant at the 5% level.</li>
-            <li><strong>Residuals are not normal.</strong> In the statsmodels fit on the training rows, the Jarque&ndash;Bera test gives p = 0.0035 and the omnibus test p = 0.024. The Durbin&ndash;Watson statistic is 2.10, so there is no sign of autocorrelation, and the condition number is 9.4.</li>
-            <li><strong>Small test set.</strong> The 18 test rows give R&sup2; 0.785, but the five folds range from 0.58 to 0.81. Fold 1 reproduces the test-set scores exactly (0.7850 and 1.7790 mm), so the CV mean is the steadier figure.</li>
+            <li><strong>Collinearity is resolved.</strong> After pruning EVI and then LAI, every VIF is below 5 (largest: 2 m temperature at 4.69; NDVI at 2.99). Only NDVI and soil moisture are significant at the 5% level; the other four coefficients cannot be told apart from zero.</li>
+            <li><strong>Residuals are not normal.</strong> In the statsmodels fit on the training rows, the Jarque&ndash;Bera test gives p = 0.0035 and the omnibus test p = 0.023. The Durbin&ndash;Watson statistic is 2.10, so there is no sign of autocorrelation, and the condition number is 5.7. Equal variance was judged from the residual plot only; no formal test was run.</li>
+            <li><strong>Small test set.</strong> The 18 test rows give R&sup2; 0.785, but the five folds range from 0.60 to 0.85. Fold 1 reproduces the test-set scores exactly (0.7853 and 1.7778 mm), so the CV mean is the steadier figure.</li>
          </ul>
       </div>
    </section>
