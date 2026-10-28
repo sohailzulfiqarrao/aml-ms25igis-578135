@@ -1,0 +1,149 @@
+/* Landing-page theme shared with the main page (sohailzulfiqarrao.github.io): dark "neural graph" look by default,
+   a light variant when the system asks for one. It is loaded only by the landing page, after site.css, and every rule
+   is scoped to body.neural, so no other page of this site is affected. */
+body.neural {
+   --g1: #34d399;
+   --g2: #22d3ee;
+   --bg: #050912;
+   --surface: rgba(13, 24, 48, .74);
+   --ink: #e8eefb;
+   --muted: #a3b3cc;
+   --line: rgba(148, 163, 184, .2);
+   --link: #67e8f9;
+   --chip: rgba(24, 40, 76, .75);
+   --btn-bg: linear-gradient(120deg, var(--g1), var(--g2));
+   --btn-ink: #04101e;
+   --shadow: 0 10px 34px rgba(2, 6, 18, .5);
+   --shadow-hover: 0 18px 50px rgba(2, 6, 18, .6), 0 0 0 1px rgba(34, 211, 238, .28), 0 12px 40px rgba(52, 211, 153, .2);
+   --mono: "JetBrains Mono", "Cascadia Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+   color-scheme: dark;
+   background: var(--bg);
+   -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: light) {
+   body.neural {
+      --bg: #f4f7fc;
+      --surface: rgba(255, 255, 255, .88);
+      --ink: #0b1630;
+      --muted: #475a7a;
+      --line: rgba(15, 30, 66, .14);
+      --link: #0e7490;
+      --chip: #eaf0fa;
+      --btn-ink: #04101e;
+      --shadow: 0 10px 30px rgba(20, 40, 90, .12);
+      --shadow-hover: 0 16px 40px rgba(20, 40, 90, .2), 0 0 0 1px rgba(8, 145, 178, .3);
+      color-scheme: light;
+   }
+}
+
+/* the glow and the faint grid behind everything */
+body.neural::before {
+   content: "";
+   position: fixed;
+   inset: 0;
+   z-index: -1;
+   pointer-events: none;
+   background:
+      radial-gradient(900px 520px at 85% 8%, rgba(34, 211, 238, .16), transparent 62%),
+      radial-gradient(700px 440px at 6% 0%, rgba(52, 211, 153, .14), transparent 62%),
+      linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 56px 56px,
+      linear-gradient(90deg, var(--line) 1px, transparent 1px) 0 0 / 56px 56px;
+   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+   mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+   opacity: .75;
+}
+
+body.neural a:focus-visible, body.neural .button:focus-visible { outline-color: var(--g1); }
+
+/* ---------- header ---------- */
+body.neural .masthead {
+   background: linear-gradient(135deg, rgba(10, 47, 79, .72), rgba(7, 12, 28, .6));
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+   border-bottom: 1px solid var(--line);
+   position: relative;
+}
+@media (prefers-color-scheme: light) {
+   /* a solid navy header keeps the white title readable on the light page */
+   body.neural .masthead { background: linear-gradient(135deg, #0a2f4f, #0b3a66); }
+}
+body.neural .masthead::after {
+   content: "";
+   position: absolute;
+   left: 0;
+   right: 0;
+   bottom: -1px;
+   height: 2px;
+   background: linear-gradient(90deg, transparent, var(--g1), var(--g2), transparent);
+   opacity: .85;
+}
+body.neural .logo { box-shadow: 0 0 0 1px rgba(255, 255, 255, .25), 0 8px 26px rgba(34, 211, 238, .22); }
+body.neural .titles::before {
+   content: "// course 02";
+   display: block;
+   margin-bottom: 4px;
+   font-family: var(--mono);
+   font-size: 12.5px;
+   letter-spacing: .05em;
+   color: #67e8f9;
+}
+body.neural h1 {
+   letter-spacing: -.02em;
+   background: linear-gradient(120deg, #ffffff 0%, #bfeaff 45%, #c4b5fd 100%);
+   -webkit-background-clip: text;
+   background-clip: text;
+   color: transparent;
+}
+body.neural .sub { font-family: var(--mono); font-size: 13px; letter-spacing: .02em; color: #9fb4d4; }
+body.neural .home-link { color: #fff; font-family: var(--mono); font-size: 13px; border-color: rgba(103, 232, 249, .4); background: rgba(34, 211, 238, .08); }
+body.neural .home-link:hover { background: rgba(34, 211, 238, .2); border-color: rgba(103, 232, 249, .8); }
+
+/* ---------- profile strip ---------- */
+body.neural .profile .item {
+   background: var(--surface);
+   border-color: var(--line);
+   border-radius: 14px;
+   -webkit-backdrop-filter: blur(8px);
+   backdrop-filter: blur(8px);
+}
+body.neural .profile dt { font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; color: var(--muted); }
+
+/* ---------- section heading ---------- */
+body.neural .section-head h2 { font-size: clamp(26px, 3.4vw, 34px); letter-spacing: -.025em; }
+
+/* ---------- cards ---------- */
+body.neural .card {
+   border-radius: 20px;
+   border-color: var(--line);
+   -webkit-backdrop-filter: blur(8px);
+   backdrop-filter: blur(8px);
+   transition: transform .3s, border-color .3s, box-shadow .3s;
+}
+body.neural .card:hover { transform: translateY(-5px); border-color: rgba(34, 211, 238, .45); }
+body.neural .thumb { background: #0a1426; overflow: hidden; }
+body.neural .thumb.plot { background: #0a1426; }
+body.neural .thumb img { transition: transform .6s cubic-bezier(.2, .7, .2, 1); }
+body.neural .card:hover .thumb img { transform: scale(1.04); }
+body.neural .meta { font-family: var(--mono); font-size: 12px; }
+body.neural .badge { color: #04101e; background: linear-gradient(120deg, var(--g1), var(--g2)); letter-spacing: .05em; }
+body.neural h3 { letter-spacing: -.015em; }
+body.neural .tags li { border: 1px solid var(--line); background: var(--chip); font-weight: 500; font-size: 12.5px; color: var(--muted); }
+body.neural .actions { border-top-color: var(--line); }
+body.neural .actions a:not(.button) { font-weight: 650; text-underline-offset: 4px; }
+body.neural .button { border-radius: 12px; box-shadow: 0 8px 24px rgba(139, 92, 246, .28); transition: transform .2s, box-shadow .2s, filter .2s; }
+body.neural .button:hover { filter: none; transform: translateY(-2px); box-shadow: 0 12px 32px rgba(139, 92, 246, .45); }
+body.neural .card.upcoming { border: 2px dashed rgba(139, 92, 246, .5); background: transparent; }
+body.neural .card.upcoming strong { font-family: var(--mono); font-size: 15px; color: var(--link); }
+
+/* ---------- footer ---------- */
+body.neural footer { background: rgba(5, 9, 18, .78); border-top: 1px solid var(--line); color: var(--muted); position: relative; }
+body.neural footer::before { content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 2px; background: linear-gradient(90deg, transparent, var(--g2), var(--g1), transparent); opacity: .7; }
+body.neural footer a { color: var(--link); font-weight: 600; }
+@media (prefers-color-scheme: light) {
+   body.neural footer { background: rgba(234, 240, 250, .9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+   body.neural *, body.neural *::before, body.neural *::after { transition-duration: .01ms !important; }
+}
