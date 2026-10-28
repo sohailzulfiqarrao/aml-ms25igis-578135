@@ -173,6 +173,8 @@ body.neural .badge { box-shadow: 0 0 16px rgba(52, 211, 153, .35); }
 body.neural .meta { color: #6ee7b7; }
 @media (prefers-color-scheme: light) { body.neural .meta { color: #047857; } }
 
+body.neural { --vz: #6ee7b7; --vz-rgb: 52, 211, 153; }
+
 /* ---- animated visualisations (the section "Machine learning, in motion") ---- */
 body.neural .viz-lab { margin-top: 34px; }
 body.neural .viz-head { margin-bottom: 18px; }
@@ -181,21 +183,23 @@ body.neural .viz-head h2 { margin: 0 0 4px; font-size: clamp(26px, 3.4vw, 34px);
 body.neural .viz-head .section-note { margin: 0; }
 body.neural .viz-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 body.neural .viz-card { margin: 0; display: flex; flex-direction: column; overflow: hidden; color: #e8eefb; border: 1px solid var(--line); border-radius: 20px; background: linear-gradient(160deg, #081226, #050b18); box-shadow: var(--shadow); transition: border-color .3s, box-shadow .3s; }
-body.neural .viz-card:hover { border-color: rgba(52, 211, 153, .5); box-shadow: var(--shadow), 0 0 40px rgba(52, 211, 153, .12); }
+body.neural .viz-card:hover { border-color: rgba(var(--vz-rgb), .5); box-shadow: var(--shadow), 0 0 40px rgba(var(--vz-rgb), .12); }
 body.neural .viz-top { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid rgba(148, 163, 184, .18); font-family: var(--mono); font-size: 12px; }
 body.neural .viz-name { flex: 1; font-weight: 600; color: #e8eefb; }
 body.neural .viz-tag { padding: 2px 9px; border: 1px solid rgba(148, 163, 184, .35); border-radius: 999px; color: #9fb4d4; font-size: 11px; white-space: nowrap; }
-body.neural .viz-real { border-color: rgba(52, 211, 153, .5); color: #6ee7b7; background: rgba(52, 211, 153, .08); }
+body.neural .viz-real { border-color: rgba(var(--vz-rgb), .5); color: var(--vz); background: rgba(var(--vz-rgb), .08); }
 body.neural .viz-replay { width: 28px; height: 28px; padding: 0; border: 1px solid rgba(148, 163, 184, .35); border-radius: 8px; background: transparent; color: #9fb4d4; font-size: 16px; line-height: 1; cursor: pointer; transition: color .2s, border-color .2s, background .2s; }
 body.neural .viz-replay:hover { color: #fff; border-color: rgba(103, 232, 249, .7); background: rgba(34, 211, 238, .12); }
 body.neural .viz-replay:focus-visible { outline: 2px solid var(--g1); outline-offset: 2px; }
 body.neural .viz-card canvas { display: block; width: 100%; aspect-ratio: 16 / 10; }
 body.neural .viz-stats { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; padding: 10px 14px 4px; font-family: var(--mono); font-size: 12.5px; color: #9fb4d4; }
 body.neural .viz-stats span { white-space: nowrap; }
-body.neural .viz-stats b { color: #6ee7b7; font-weight: 700; font-variant-numeric: tabular-nums; }
+body.neural .viz-stats b { color: var(--vz); font-weight: 700; font-variant-numeric: tabular-nums; }
 body.neural .viz-note { margin: 0; padding: 2px 14px 14px; font-size: 13px; line-height: 1.5; color: #8296b4; }
 @media (max-width: 760px) { body.neural .viz-grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) {
    body.neural .viz-replay { display: none; }
    body.neural::after { background-image: url("motif-static.svg"); }
 }
+
+body.neural .viz-stats code, body.neural .viz-note code { font-family: var(--mono); font-size: .92em; color: #c4d4ea; }

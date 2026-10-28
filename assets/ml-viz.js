@@ -344,7 +344,8 @@
    var panels = [], running = false, last = 0;
 
    function frame(now) {
-      var dt = Math.min(0.05, (now - last) / 1000 || 0.016), any = false;
+      var dt = (now - last) / 1000, any = false;
+      if (!(dt > 0)) { dt = 0.016; } if (dt > 0.05) { dt = 0.05; }   // a frame stamp can precede the start time: never step backwards
       last = now;
       panels.forEach(function (p) { if (p.visible) { any = true; p.update(dt); p.draw(); } });
       if (any && !document.hidden) { requestAnimationFrame(frame); } else { running = false; }
