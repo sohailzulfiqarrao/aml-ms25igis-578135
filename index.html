@@ -35,6 +35,76 @@
       </dl>
    </section>
 
+   <section class="wrap viz-lab" aria-labelledby="viz-title">
+      <div class="viz-head">
+         <p class="viz-kicker">// live</p>
+         <h2 id="viz-title">Machine learning, in motion</h2>
+         <p class="section-note">Four small models running in your browser. The regression uses the real data of Assignment 1; the other three are illustrations.</p>
+      </div>
+      <div class="viz-grid">
+
+         <figure class="viz-card" data-viz="regression">
+            <figcaption class="viz-top">
+               <span class="viz-name">Linear regression</span>
+               <span class="viz-tag viz-real">Assignment 1 data</span>
+               <button class="viz-replay" type="button" aria-label="Replay the regression animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: a line is fitted by gradient descent to 87 observations of NDVI against evapotranspiration"></canvas>
+            <p class="viz-stats">
+               <span><b data-s="r2">--</b> R&sup2;</span>
+               <span><b data-s="slope">0.0</b> mm per NDVI unit</span>
+               <span>step <b data-s="step">0</b></span>
+            </p>
+            <p class="viz-note">Gradient descent on NDVI alone, all 87 rows. The report&rsquo;s test R&sup2; of 0.785 uses six predictors and a held-out set.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="kmeans">
+            <figcaption class="viz-top">
+               <span class="viz-name">K-means clustering</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the clustering animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: three centroids move step by step until the points settle into three clusters"></canvas>
+            <p class="viz-stats">
+               <span>iteration <b data-s="iter">0</b></span>
+               <span>inertia <b data-s="inertia">--</b></span>
+               <span><b data-s="state">random start</b></span>
+            </p>
+            <p class="viz-note">Assign every point to its nearest centroid, move each centroid to the mean of its points, repeat until nothing changes.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="network">
+            <figcaption class="viz-top">
+               <span class="viz-name">Neural network</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the neural network animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: signals travel through a small neural network from three inputs to two outputs"></canvas>
+            <p class="viz-stats">
+               <span>input <b data-s="in">--</b></span>
+               <span>output <b data-s="out">...</b></span>
+            </p>
+            <p class="viz-note">A forward pass: each layer weighs its inputs (green positive, violet negative), applies tanh, and passes the result on.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="loss">
+            <figcaption class="viz-top">
+               <span class="viz-name">Training and validation loss</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the training animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: training loss keeps falling while validation loss turns upward, and early stopping marks the best epoch"></canvas>
+            <p class="viz-stats">
+               <span>epoch <b data-s="epoch">0</b></span>
+               <span>train <b data-s="train">--</b></span>
+               <span>val <b data-s="val">--</b></span>
+            </p>
+            <p class="viz-note">Validation loss turns up while training loss still falls: the model starts to overfit, so training stops at the best epoch.</p>
+         </figure>
+
+      </div>
+   </section>
+
    <div class="wrap section-head">
       <h2 id="assignments-title">Assignments</h2>
       <p class="section-note">Each assignment has a results page, a written report and a Python notebook.</p>
@@ -115,6 +185,9 @@
          <a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135">Repository</a></p>
    </div>
 </footer>
+
+<script src="assets/ml-data.js"></script>
+<script src="assets/ml-viz.js" defer></script>
 
 </body>
 </html>
