@@ -147,3 +147,28 @@ body.neural footer a { color: var(--link); font-weight: 600; }
 @media (prefers-reduced-motion: reduce) {
    body.neural *, body.neural *::before, body.neural *::after { transition-duration: .01ms !important; }
 }
+
+/* ================= Machine learning: a neural network, clusters and a loss curve on a dot matrix ================= */
+body.neural::before {
+   background:
+      radial-gradient(900px 520px at 85% 8%, rgba(34, 211, 238, .14), transparent 62%),
+      radial-gradient(700px 440px at 6% 0%, rgba(52, 211, 153, .16), transparent 62%),
+      radial-gradient(circle, var(--line) 1.3px, transparent 1.8px) 0 0 / 30px 30px;
+   opacity: .9;
+}
+body.neural::after {
+   content: "";
+   position: fixed;
+   inset: 0;
+   z-index: -1;
+   pointer-events: none;
+   background: url("motif.svg") right top / cover no-repeat;
+   opacity: .85;
+   -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+   mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
+}
+@media (prefers-color-scheme: light) { body.neural::after { opacity: .5; } }
+body.neural .titles::before { content: "// course 02 \00b7  machine learning"; }
+body.neural .badge { box-shadow: 0 0 16px rgba(52, 211, 153, .35); }
+body.neural .meta { color: #6ee7b7; }
+@media (prefers-color-scheme: light) { body.neural .meta { color: #047857; } }
