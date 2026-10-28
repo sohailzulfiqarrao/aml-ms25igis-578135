@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <title>Assignment 2 | Clustering E-commerce Product Offers</title>
+   <meta name="description" content="Assignment 2 for Applied Machine Learning, MS Remote Sensing and GIS, NUST IGIS: K-means, Ward, DBSCAN and Gaussian mixtures on 35,311 product offers, with a deployment recommendation backed by held-out, stability and scalability evidence.">
+   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a2f4f'/%3E%3Cpath d='M7 23l6-7 5 4 7-11' fill='none' stroke='%23e3a72f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+   <link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="theme-teal">
+
+<header class="masthead">
+   <div class="wrap">
+      <img class="logo" src="../../assets/nust-logo.jpg" alt="NUST logo: Defining futures">
+      <div class="titles">
+         <h1>Assignment 2</h1>
+         <p class="sub">Clustering &middot; Applied Machine Learning, Fall 2026</p>
+      </div>
+   </div>
+</header>
+
+<main>
+   <p class="wrap crumb"><a href="../../">&larr; All assignments</a></p>
+
+   <section class="wrap profile" aria-label="Student">
+      <dl>
+         <div class="item"><dt>Student</dt><dd>Sohail Zulfiqar</dd></div>
+         <div class="item"><dt>Registration ID</dt><dd>578135</dd></div>
+         <div class="item"><dt>Program</dt><dd>MS GIS &amp; RS, 2025</dd></div>
+         <div class="item"><dt>Instructor</dt><dd>Dr Hammad Gilani</dd></div>
+      </dl>
+   </section>
+
+   <section class="wrap profile results" aria-label="Results">
+      <dl>
+         <div class="item"><dt>Product offers</dt><dd>35,311<small>10 categories, 306 merchants</small></dd></div>
+         <div class="item"><dt>Held out</dt><dd>25,311<small>never used for fitting or tuning</small></dd></div>
+         <div class="item"><dt>K-means ARI</dt><dd>0.62<small>NMI 0.70, on the held-out offers</small></dd></div>
+         <div class="item"><dt>Stability</dt><dd>0.82<small>K-means, mean ARI on 80% resamples</small></dd></div>
+      </dl>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="downloads-title">Report, code and data</h2>
+      <p class="section-note">Everything is in the repository; the PDF and HTML files open directly from this site.</p>
+   </div>
+   <section class="wrap how" aria-labelledby="downloads-title">
+      <div class="item">
+         <h3>Read the report</h3>
+         <p>The written report, as a PDF, plus a one-page summary.</p>
+         <p><a class="button" href="Clustering_Report.pdf">Report (PDF)</a></p>
+         <p><a href="Clustering_Summary_1page.pdf">One-page summary (PDF)</a></p>
+         <p><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/report.md">Report (Markdown)</a></p>
+      </div>
+      <div class="item">
+         <h3>See the code</h3>
+         <p>The notebook with all code and output: as an HTML page, on GitHub, or run it yourself in Colab.</p>
+         <p><a class="button" href="Clustering_Assignment.html">Notebook (HTML)</a></p>
+         <p><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/Clustering_Assignment.ipynb">Notebook on GitHub</a>
+            &middot; <a href="https://colab.research.google.com/github/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/Clustering_Assignment.ipynb">Open in Colab</a></p>
+      </div>
+      <div class="item">
+         <h3>Use the data</h3>
+         <p>The PriceRunner product-offer data the notebook downloads, and the Python packages it needs.</p>
+         <p><a class="button" href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/pricerunner_aggregate.csv">pricerunner_aggregate.csv</a></p>
+         <p><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/requirements.txt">requirements.txt</a></p>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="aim-title">Objective and data</h2>
+   </div>
+   <section class="wrap prose" aria-labelledby="aim-title">
+      <p>
+         A price-comparison engine receives merchant offers whose titles are free text, such as
+         <em>"apple iphone 8 plus 64gb silver"</em>. The task is to group offers into coherent product families with
+         four clustering algorithms, compare them honestly, and recommend one for deployment. New merchants arrive
+         without labels, which is why clustering is attractive.
+      </p>
+      <p>
+         The data are 35,311 offers with a title, a merchant, a fine product id (13,233 products) and a coarse
+         category label (10 categories, such as mobile phones, CPUs and dishwashers). The category labels are used
+         only to <em>score</em> clusters, never to fit them.
+      </p>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="method-title">Method</h2>
+      <p class="section-note">The steps of the notebook, in order.</p>
+   </div>
+   <section class="wrap" aria-labelledby="method-title">
+      <div class="panel">
+         <ol class="steps">
+            <li><strong>Audit.</strong> No missing values. 4,318 offers (12.2%) repeat another title exactly and are kept, categories are imbalanced 2.5 to 1, and titles are short (median 52 characters) and partly German.</li>
+            <li><strong>Split without leakage.</strong> A stratified 10,000-offer <em>dev</em> set is used for every fit and tuning step. The other 25,311 offers are only touched at the end. TF-IDF and the SVD are learned on dev titles only.</li>
+            <li><strong>Features.</strong> TF-IDF on word 1- and 2-grams, reduced to 20 latent (LSA) dimensions and scaled to unit length, so Euclidean K-means behaves like cosine K-means.</li>
+            <li><strong>Number of clusters.</strong> No internal index points at 10 (silhouette and Calinski-Harabasz prefer 19), so <em>k</em> = 10 is taken from the retailer's taxonomy and disclosed as such.</li>
+            <li><strong>Four algorithms.</strong> K-means (a from-scratch version reaches exactly the same partition as scikit-learn), Ward agglomerative clustering, DBSCAN with <code>eps</code> and <code>min_samples</code> chosen by a label-free grid, and a Gaussian mixture with full covariance chosen by BIC.</li>
+            <li><strong>Evaluate and decide.</strong> Adjusted Rand Index (ARI) and Normalised Mutual Information (NMI) against the categories, stability on 80% subsamples, fit time against size, and a final score on the 25,311 held-out offers.</li>
+         </ol>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="results-title">Results</h2>
+   </div>
+   <section class="wrap" aria-labelledby="results-title">
+      <div class="panel table-wrap">
+         <h3>Four models, scored against the 10 categories</h3>
+         <table class="data text">
+            <thead><tr><th>Model</th><th class="num">Clusters</th><th class="num">Noise (dev)</th><th class="num">ARI dev</th><th class="num">ARI held out</th><th class="num">NMI held out</th><th class="num">Stability</th><th>Scores a new offer</th></tr></thead>
+            <tbody>
+               <tr class="key"><td>K-means</td><td class="num">10</td><td class="num">0%</td><td class="num">0.62</td><td class="num">0.62</td><td class="num">0.70</td><td class="num">0.82</td><td>natively</td></tr>
+               <tr><td>Agglomerative (Ward)</td><td class="num">10</td><td class="num">0%</td><td class="num">0.55</td><td class="num">0.56</td><td class="num">0.69</td><td class="num">0.68</td><td>nearest-neighbour rule</td></tr>
+               <tr><td>DBSCAN (eps 0.475, min_samples 160)</td><td class="num">15</td><td class="num">19.5%</td><td class="num">0.47</td><td class="num">0.48</td><td class="num">0.65</td><td class="num">0.74</td><td>nearest-core-point rule</td></tr>
+               <tr><td>Gaussian mixture (full covariance)</td><td class="num">10</td><td class="num">0%</td><td class="num">0.54</td><td class="num">0.53</td><td class="num">0.65</td><td class="num">0.69</td><td>natively, with probabilities</td></tr>
+            </tbody>
+         </table>
+         <p class="section-note" style="margin: 12px 0 0">ARI and NMI: agreement with the true categories (1 is perfect, 0 is chance). Stability: ARI between refits on 80% subsamples. Ward and DBSCAN have no native <code>predict()</code>, so they are scored on held-out offers with a nearest-neighbour rule.</p>
+      </div>
+
+      <div class="panel table-wrap">
+         <h3>Fit time in seconds</h3>
+         <table class="data">
+            <thead><tr><th>Offers</th><th class="num">K-means</th><th class="num">Ward</th><th class="num">DBSCAN</th><th class="num">Gaussian mixture</th></tr></thead>
+            <tbody>
+               <tr><td>10,000</td><td class="num">0.20</td><td class="num">4.53</td><td class="num">0.26</td><td class="num">2.62</td></tr>
+               <tr><td>35,311</td><td class="num">0.55</td><td class="num">not run: about 5 GB of memory</td><td class="num">3.95</td><td class="num">12.92</td></tr>
+            </tbody>
+         </table>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="figures-title">Figures</h2>
+      <p class="section-note">Six of the 16 figures in the notebook; the report has all of them.</p>
+   </div>
+   <section class="wrap figures" aria-labelledby="figures-title">
+      <figure>
+         <img src="images/fig10_tsne.png" width="1490" height="920" loading="lazy" alt="t-SNE map of 3,000 offers coloured by true category and by the category of each model's clusters">
+         <figcaption><strong>The data, mapped.</strong> A t-SNE map coloured by true category and by each model's clusters. All four recover the separate islands (CPUs, TVs, cameras, phones) and differ in the crowded middle, where fridges, freezers, dishwashers and microwaves overlap.</figcaption>
+      </figure>
+      <figure>
+         <img src="images/fig07_dbscan_grid.png" width="1391" height="847" loading="lazy" alt="Heat map of the label-free DBSCAN score over min_samples and eps, with the selected cell framed">
+         <figcaption><strong>Choosing DBSCAN's parameters.</strong> The label-free score over a grid of <code>min_samples</code> and <code>eps</code>. The framed cell (160, 0.475) is the same one an oracle using the labels would pick.</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/fig12_kmeans_failure_gallery.png" width="1690" height="645" loading="lazy" alt="Five synthetic datasets clustered by K-means on top and by a better-matched algorithm below">
+         <figcaption><strong>Question 1.</strong> The same synthetic data clustered by K-means (top) and by an algorithm whose assumptions match the shape (bottom).</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/fig13_kmeans_theory.png" width="1590" height="432" loading="lazy" alt="Simulation against closed-form predictions for size imbalance, different densities and elongated clusters">
+         <figcaption><strong>Theory against simulation.</strong> The closed-form tipping points for size imbalance and elongation, checked by simulation.</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/fig15_standardisation_scores.png" width="1490" height="434" loading="lazy" alt="ARI and NMI of each algorithm under four feature-scaling conditions">
+         <figcaption><strong>Question 2.</strong> ARI and NMI for each algorithm with and without scaling the extra title descriptors.</figcaption>
+      </figure>
+      <figure class="wide">
+         <img src="images/fig16_deployment_evidence.png" width="1690" height="457" loading="lazy" alt="Accuracy on held-out offers, stability under subsampling, and fit time against data size for the four models">
+         <figcaption><strong>Question 4.</strong> The deployment evidence: accuracy on unseen offers, stability under resampling, and fit time against size.</figcaption>
+      </figure>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="questions-title">The four questions</h2>
+      <p class="section-note">One-line answers; the derivations and evidence are in the report.</p>
+   </div>
+   <section class="wrap" aria-labelledby="questions-title">
+      <div class="panel">
+         <h3>1. Why can K-means fail when clusters differ in density, size or shape?</h3>
+         <p>It minimises squared distance to centroids, which is the hard-assignment limit of a Gaussian mixture with equal weights and identical spherical covariances. So it can only represent equal-size, equal-spread, convex clusters. Closed-form tipping points follow: it splits a big cluster rather than isolate a small one once the size ratio passes about 25 (clusters 4 standard deviations apart), and it cuts elongated clusters across once their long-axis spread exceeds &radic;(&pi;/8), about 0.63, of the gap between them. Simulation confirms both: K-means collapses (ARI near 0) where a Gaussian mixture or DBSCAN scores 1.0.</p>
+      </div>
+      <div class="panel">
+         <h3>2. How does standardisation change the clusters?</h3>
+         <p>With four unscaled title descriptors added, one feature (title length) carried 93% of the variance and the clusters became bins of title length: K-means ARI fell from 0.60 to 0.01. Z-scoring restored it to 0.54. It is not free, though: the 20 LSA coordinates already share a scale, and z-scoring them lowered Ward (0.55 to 0.48) and DBSCAN (0.47 to 0.37). Standardise when features differ in units, and re-derive <code>eps</code> afterwards.</p>
+      </div>
+      <div class="panel">
+         <h3>3. How should DBSCAN's eps and min_samples be chosen without guessing?</h3>
+         <p>The two parameters fix one density level together, so choose them together. Use the dimension rule to range <code>min_samples</code> (at least D + 1, here 21), read the k-distance knee as an <em>upper bound</em> for <code>eps</code> (here it merged at least 94% of the points into one cluster for <code>min_samples</code> of 40 or more), then pick the cell of a (<code>min_samples</code>, <code>eps</code>) grid that maximises a label-free score with a guard against one giant cluster. That chose 160 and 0.475, the same cell the labels would.</p>
+      </div>
+      <div class="panel">
+         <h3>4. Which model should be deployed, and what is the evidence?</h3>
+         <p><strong>K-means</strong> (k = 10 on the unit-length LSA vectors). It is the most accurate on 25,311 unseen offers (ARI 0.62), the most stable under resampling (0.82), tens of times cheaper to fit than Ward (and the gap grows with size), and the only simple model with an exact out-of-sample rule: the whole model is ten centroids. A confidence margin routes uncertain offers to human review. DBSCAN is better kept as an outlier and near-duplicate detector, since it leaves about 19% of offers unlabelled.</p>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="notes-title">Limits of the evidence</h2>
+   </div>
+   <section class="wrap" aria-labelledby="notes-title">
+      <div class="panel note">
+         <ul class="steps">
+            <li><strong>The margin over Ward is modest.</strong> K-means' own seed-to-seed spread is about 0.04 ARI, so its lead over Ward (about 0.06) is not decisive on accuracy alone. The decision rests on accuracy, stability, cost and serving simplicity together.</li>
+            <li><strong>Titles only, one split.</strong> Offers are short text. German-language titles form their own clusters in every model, and the results come from one dev sample and one holdout.</li>
+            <li><strong>Two label-informed choices.</strong> The number of clusters (10) and the embedding size (20) use outside knowledge; every other tuning step is label-free.</li>
+            <li><strong>Clustering is not the best category assigner.</strong> An ARI of 0.62 is good but not high. Where labels exist, a supervised classifier is the right tool; clustering earns its place for unlabelled merchants and for discovering structure.</li>
+         </ul>
+      </div>
+   </section>
+
+   <div class="wrap section-head">
+      <h2 id="run-title">Run the notebook</h2>
+      <p class="section-note">Three ways to work with it.</p>
+   </div>
+   <section class="wrap how" aria-labelledby="run-title">
+      <div class="item">
+         <h3>Read it</h3>
+         <p>The HTML export shows every cell with its code, output and figures; GitHub renders the notebook too, though a notebook this size can be slow to load there.</p>
+         <p><a class="button" href="Clustering_Assignment.html">Open the HTML</a></p>
+      </div>
+      <div class="item">
+         <h3>Run it in Colab</h3>
+         <p>The first code cell downloads <code>pricerunner_aggregate.csv</code> from this repository, so there is nothing to upload. Then choose Runtime, Run all.</p>
+         <p><a class="button" href="https://colab.research.google.com/github/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/Clustering_Assignment.ipynb">Open in Colab</a></p>
+      </div>
+      <div class="item">
+         <h3>Run it locally</h3>
+         <p>Clone the repository, then from the <code>Assignment 2</code> folder (about 10 minutes):</p>
+<pre>pip install -r requirements.txt
+jupyter notebook</pre>
+      </div>
+   </section>
+</main>
+
+<footer>
+   <div class="wrap">
+      <p>Applied Machine Learning &middot; Fall 2026 &middot; Institute of Geographical Information Systems, School of
+         Civil and Environmental Engineering, National University of Sciences and Technology, Islamabad.</p>
+      <p style="flex: 0 1 auto"><a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135/blob/main/Assignments/Assignment%202/report.md">Report</a> &middot;
+         <a href="https://github.com/sohailzulfiqarrao/aml-ms25igis-578135">Repository</a></p>
+   </div>
+</footer>
+
+</body>
+</html>

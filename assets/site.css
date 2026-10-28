@@ -135,6 +135,7 @@ h2 { margin: 0 0 4px; font-size: 24px; }
 
 /* each assignment card takes the accent colour of its own page */
 .card.assignment1 { --accent: #9a3412; border-top: 4px solid var(--accent); }
+.card.assignment2 { --accent: #14615e; border-top: 4px solid var(--accent); }
 
 .thumb { display: block; border-bottom: 1px solid var(--line); background: var(--chip); }
 .thumb img { display: block; width: 100%; height: auto; aspect-ratio: 11 / 7; object-fit: cover; }
@@ -316,6 +317,11 @@ footer a { color: #fff; }
    .panel { padding: 16px 16px; }
 }
 
+/* an assignment page takes the accent colour of its landing card */
+body.theme-teal { --accent: #14615e; }
+
 @media (prefers-color-scheme: dark) {
    .badge { color: #06222b; }
+   .card.assignment1 { --accent: #f0a36a; }
+   .card.assignment2, body.theme-teal { --accent: #3fb3ab; }
 }

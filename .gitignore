@@ -1,4 +1,4 @@
-# This repository publishes Assignment 1 only.
+# This repository publishes the assignments only (Assignment 1 and Assignment 2).
 # Remove a line below to add that folder to the repository later.
 
 # In-class notebooks
@@ -6,6 +6,9 @@ Codes/
 
 # Lecture slides and the course PDF belong to the instructor and are large
 Lec/
+
+# Exam papers, not coursework to publish
+/mid-exam*.pdf
 
 # Loose copy of a file that already lives in Assignments/Assignment 1/ (byte-identical)
 /Islamabad_Data.csv
@@ -15,6 +18,17 @@ Lec/
 /MLR_Assignment.ipynb
 Assignments/Assignment 1/MLR_Assignment.ipynb
 Assignments/Assignment 1/salary_data.*
+
+# Files in the Assignment 2 folder that are not part of the clustering assignment:
+# copies of Assignment 1 files, the Word sources of the PDFs, the older PDF export,
+# and the folders the notebook regenerates whenever it is run
+Assignments/Assignment 2/Islamabd_MLR_Assignment.ipynb
+Assignments/Assignment 2/MLR_Assignment.ipynb
+Assignments/Assignment 2/salary_data.*
+Assignments/Assignment 2/*.docx
+Assignments/Assignment 2/Clustering_Assignment_Report.pdf
+Assignments/Assignment 2/models/
+Assignments/Assignment 2/results/
 
 # Local helper script for pushing updates; it stays on this machine
 commit.bat
