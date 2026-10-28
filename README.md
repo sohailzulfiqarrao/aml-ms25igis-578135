@@ -6,6 +6,8 @@ single GitHub Pages site.
 
 **Site:** https://sohailzulfiqarrao.github.io/aml-ms25igis-578135/
 
+**Main page:** https://sohailzulfiqarrao.github.io/ (Web GIS and machine learning together)
+
 ## Assignments
 
 | Assignment | Folder | Results page | Report | Notebook |
