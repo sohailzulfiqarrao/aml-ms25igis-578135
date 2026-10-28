@@ -78,6 +78,20 @@ code { padding: 1px 6px; border-radius: 5px; background: var(--chip); font-size:
    background: #fff;
    box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
+.home-link {
+   justify-self: end;
+   padding: 8px 16px;
+   border: 1px solid rgba(255, 255, 255, .35);
+   border-radius: 999px;
+   color: #fff;
+   text-decoration: none;
+   font-size: 14px;
+   font-weight: 600;
+   background: rgba(255, 255, 255, .08);
+   transition: background .2s, border-color .2s;
+}
+.home-link:hover { background: rgba(255, 255, 255, .18); border-color: rgba(255, 255, 255, .7); }
+.home-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .titles { text-align: center; }
 h1 { margin: 0; font-size: clamp(24px, 4vw, 32px); font-weight: 700; letter-spacing: .01em; }
 .sub { margin: 4px 0 0; color: #cfe1ef; }
@@ -311,6 +325,7 @@ footer a { color: #fff; }
 }
 @media (max-width: 640px) {
    .masthead .wrap { grid-template-columns: 1fr; justify-items: center; }
+   .home-link { justify-self: center; }
    .logo { height: 48px; }
    .card .body { padding: 18px 18px 20px; }
    .profile.results dd { font-size: 21px; }
