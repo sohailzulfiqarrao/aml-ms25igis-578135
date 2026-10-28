@@ -21,8 +21,9 @@ single GitHub Pages site.
 index.html                   landing page listing every assignment
 assets/site.css              its stylesheet, shared by every page
 assets/neural.css            the landing page theme only (dark, animated); no other page loads it
-assets/ml-viz.js, ml-data.js the four live visualisations on the landing page: regression on the real
-                             Assignment 1 data, k-means, a neural network forward pass and a training-loss curve
+assets/ml-viz.js, ml-data.js the four live visualisations on the landing page: regression and multicollinearity
+                             (correlation matrix and VIF pruning) on the real Assignment 1 data, k-means, and a
+                             training-loss curve
 assets/motif.svg             animated background art (motif-static.svg is the still copy for reduced motion)
 Assignments/Assignment 1/    Assignment 01: multiple linear regression
     index.html  report.md  images/  Islamabd_MLR_Assignment.ipynb  Islamabad_Data.csv
@@ -35,7 +36,9 @@ Each new assignment gets its own folder under `Assignments/` and a new card on t
 
 The "Machine learning, in motion" section runs only while it is on screen and the tab is visible, and with
 `prefers-reduced-motion` each panel is drawn once, in its finished state. The regression is the real NDVI and
-evapotranspiration data (a simple fit on all 87 rows, R² 0.794); the other three panels are illustrations.
+evapotranspiration data (a simple fit on all 87 rows, R² 0.794). The multicollinearity panel computes the correlation
+matrix and the VIFs from the same file, with the report's IQR capping, and reproduces the report: removing EVI and then
+LAI takes every VIF below 5. The k-means and training-loss panels are illustrations.
 
 ## Python on GitHub
 

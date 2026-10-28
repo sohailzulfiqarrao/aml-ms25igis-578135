@@ -39,7 +39,7 @@
       <div class="viz-head">
          <p class="viz-kicker">// live</p>
          <h2 id="viz-title">Machine learning, in motion</h2>
-         <p class="section-note">Four small models running in your browser. The regression uses the real data of Assignment 1; the other three are illustrations.</p>
+         <p class="section-note">Four small models running in your browser. The regression and the multicollinearity panels use the real data of Assignment 1; the other two are illustrations.</p>
       </div>
       <div class="viz-grid">
 
@@ -73,18 +73,19 @@
             <p class="viz-note">Assign every point to its nearest centroid, move each centroid to the mean of its points, repeat until nothing changes.</p>
          </figure>
 
-         <figure class="viz-card" data-viz="network">
+         <figure class="viz-card" data-viz="collinearity">
             <figcaption class="viz-top">
-               <span class="viz-name">Neural network</span>
-               <span class="viz-tag">illustration</span>
-               <button class="viz-replay" type="button" aria-label="Replay the neural network animation">&#8635;</button>
+               <span class="viz-name">Multicollinearity (VIF)</span>
+               <span class="viz-tag viz-real">Assignment 1 data</span>
+               <button class="viz-replay" type="button" aria-label="Replay the multicollinearity animation">&#8635;</button>
             </figcaption>
-            <canvas role="img" aria-label="Animation: signals travel through a small neural network from three inputs to two outputs"></canvas>
+            <canvas role="img" aria-label="Animation: a correlation matrix of eight predictors shows NDVI, EVI and LAI moving together and their variance inflation factors are high; removing EVI and then LAI brings every VIF below 5"></canvas>
             <p class="viz-stats">
-               <span>input <b data-s="in">--</b></span>
-               <span>output <b data-s="out">...</b></span>
+               <span>removed <b data-s="removed">none</b></span>
+               <span>max VIF <b data-s="maxvif">--</b></span>
+               <span>predictors <b data-s="n">8</b></span>
             </p>
-            <p class="viz-note">A forward pass: each layer weighs its inputs (green positive, violet negative), applies tanh, and passes the result on.</p>
+            <p class="viz-note">VIF = 1 &divide; (1 &minus; R&sup2;) of each predictor regressed on the others. NDVI, EVI and LAI move together (r 0.88&ndash;0.95), so the report drops EVI, then LAI: every VIF ends below 5.</p>
          </figure>
 
          <figure class="viz-card" data-viz="loss">
