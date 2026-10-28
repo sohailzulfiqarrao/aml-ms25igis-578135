@@ -1,7 +1,7 @@
 /* Machine learning in motion: four small models running live on the ML hub landing page.
      regression  gradient descent fitting a line to the real NDVI / evapotranspiration data of Assignment 1
      kmeans      Lloyd's algorithm on three clouds of points (an illustration)
-     network     a forward pass through a small neural network (an illustration)
+     collinearity the correlation matrix and VIF pruning of Assignment 1: drop EVI, then LAI (real data)
      loss        training and validation loss with early stopping (an illustration)
    Every number on screen is computed by the code that draws it. A panel animates only while it is on screen and
    the tab is visible; with prefers-reduced-motion each panel is drawn once, in its finished state. */
@@ -182,67 +182,109 @@
       return p;
    }
 
-   /* ============================= neural network ============================= */
-   function network(card) {
-      var p = base(card), sizes = [3, 5, 5, 2], r = rng(21), L, i, j;
-      var Wt = [];
-      for (L = 0; L < sizes.length - 1; L++) { Wt[L] = []; for (j = 0; j < sizes[L + 1]; j++) { Wt[L][j] = []; for (i = 0; i < sizes[L]; i++) { Wt[L][j][i] = gauss(r) * 0.95; } } }
-      var STAGE = 0.95, LEAD = 0.5, t, hold, input, acts, cycle = 0;
-      function forward(x) {
-         var a = [x.slice()];
-         for (var l = 0; l < sizes.length - 1; l++) {
-            var z = [];
-            for (var jj = 0; jj < sizes[l + 1]; jj++) { var s = 0; for (var ii = 0; ii < sizes[l]; ii++) { s += Wt[l][jj][ii] * a[l][ii]; } z.push(s); }
-            if (l === sizes.length - 2) { var m = Math.max.apply(null, z), ex = z.map(function (v) { return Math.exp(v - m); }), sum = ex[0] + ex[1]; a.push(ex.map(function (v) { return v / sum; })); }
-            else { a.push(z.map(function (v) { return Math.tanh(v); })); }
-         }
-         return a;
+   /* ============================ multicollinearity =========================== */
+   function collinearity(card) {
+      var D = window.ML_COLLINEAR;
+      if (!D) { return null; }
+      var p = base(card), names = D.names, K = names.length, n = D.rows.length, i, j;
+      var cols = names.map(function (nm, c) { return D.rows.map(function (row) { return row[c]; }); });
+
+      function corr(a, b) {
+         var ma = mean(a), mb = mean(b), sab = 0, saa = 0, sbb = 0, k;
+         for (k = 0; k < n; k++) { sab += (a[k] - ma) * (b[k] - mb); saa += (a[k] - ma) * (a[k] - ma); sbb += (b[k] - mb) * (b[k] - mb); }
+         return sab / Math.sqrt(saa * sbb);
       }
-      p.reset = function () {
-         var rr = rng(100 + cycle++);
-         input = [rr(), rr(), rr()]; acts = forward(input); t = 0; hold = 0; p.finished = false;
-      };
+      var R = [];
+      for (i = 0; i < K; i++) { R[i] = []; for (j = 0; j < K; j++) { R[i][j] = i === j ? 1 : corr(cols[i], cols[j]); } }
+
+      function inverse(m) {                                     // Gauss-Jordan, with pivoting
+         var s = m.length, a = m.map(function (row, r) { return row.concat(row.map(function (v, c) { return r === c ? 1 : 0; })); }), r, c, k, f, d, piv, tmp;
+         for (k = 0; k < s; k++) {
+            piv = k; for (r = k + 1; r < s; r++) { if (Math.abs(a[r][k]) > Math.abs(a[piv][k])) { piv = r; } }
+            tmp = a[k]; a[k] = a[piv]; a[piv] = tmp;
+            d = a[k][k]; for (c = 0; c < 2 * s; c++) { a[k][c] /= d; }
+            for (r = 0; r < s; r++) { if (r !== k) { f = a[r][k]; for (c = 0; c < 2 * s; c++) { a[r][c] -= f * a[k][c]; } } }
+         }
+         return a.map(function (row) { return row.slice(s); });
+      }
+      function vifs(active) {                                    // VIF of predictor i = the i-th diagonal entry of the inverse correlation matrix
+         var idx = [], out = [];
+         for (var q = 0; q < K; q++) { out[q] = 0; if (active[q]) { idx.push(q); } }
+         var inv = inverse(idx.map(function (a) { return idx.map(function (b) { return R[a][b]; }); }));
+         idx.forEach(function (a, k) { out[a] = inv[k][k]; });
+         return out;
+      }
+      var EVI = names.indexOf('EVI'), LAI = names.indexOf('LAI');
+      var all = names.map(function () { return true; }), noEvi = all.slice(), noBoth = all.slice();
+      noEvi[EVI] = false; noBoth[EVI] = false; noBoth[LAI] = false;
+      var V0 = vifs(all), V1 = vifs(noEvi), V2 = vifs(noBoth);
+      var T_BARS = 2.5, T_S1 = 4.7, T_S2 = 6.9, T_END = 8.5, DUR = 1.1, t, hold;
+
+      p.reset = function () { t = 0; hold = 0; p.finished = false; };
       p.update = function (dt) {
          t += dt;
-         if (t >= LEAD + 3 * STAGE) { p.finished = true; hold += dt; if (hold > 2 && !reduce) { p.reset(); } }
+         if (t >= T_END) { p.finished = true; hold += dt; if (hold > 3 && !reduce) { p.reset(); } }
       };
       p.draw = function () {
          p.begin();
-         var c = p.ctx, W = p.W, H = p.H, mx = 38, my = 26;
-         function X(l) { return mx + l * (W - 2 * mx) / (sizes.length - 1); }
-         function Y(l, k) { return my + (k + 0.5) * (H - 2 * my) / sizes[l]; }
-         var ready = function (l) { return reduce ? 1 : (l === 0 ? ease(t / 0.4) : ease((t - (LEAD + (l - 1) * STAGE + STAGE * 0.8)) / 0.25)); };
-         for (L = 0; L < sizes.length - 1; L++) {
-            var q = reduce ? 1 : clamp((t - (LEAD + L * STAGE)) / (STAGE * 0.8), 0, 1);
-            for (j = 0; j < sizes[L + 1]; j++) {
-               for (i = 0; i < sizes[L]; i++) {
-                  var wgt = Wt[L][j][i], col = wgt >= 0 ? COL.green : COL.violet, str = Math.min(1, Math.abs(wgt) / 1.6);
-                  c.strokeStyle = rgba(col, 0.1 + 0.22 * str); c.lineWidth = 0.8 + 1.6 * str;
-                  c.beginPath(); c.moveTo(X(L), Y(L, i)); c.lineTo(X(L + 1), Y(L + 1, j)); c.stroke();
-                  if (!reduce && q > 0 && q < 1 && Math.abs(wgt * acts[L][i]) > 0.1) {
-                     var tail = Math.max(0, q - 0.22);
-                     var x1 = lerp(X(L), X(L + 1), tail), y1 = lerp(Y(L, i), Y(L + 1, j), tail), x2 = lerp(X(L), X(L + 1), q), y2 = lerp(Y(L, i), Y(L + 1, j), q);
-                     var gr = c.createLinearGradient(x1, y1, x2, y2); gr.addColorStop(0, rgba(col, 0)); gr.addColorStop(1, rgba(col, 0.95));
-                     c.strokeStyle = gr; c.lineWidth = 2.2; c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2, y2); c.stroke();
-                     c.fillStyle = rgba(col, 1); c.beginPath(); c.arc(x2, y2, 2.4, 0, TAU); c.fill();
-                  }
-               }
+         var c = p.ctx, W = p.W, H = p.H, topM = 46, botM = 26, rowH = Math.min(31, (H - topM - botM) / K), x0 = 44;
+         var heatW = K * rowH, xb = x0 + heatW + 26, barW = Math.max(40, W - xb - 40), VMAX = 32;
+         function bx(v) { return xb + Math.min(v, VMAX) / VMAX * barW; }
+         var k1 = reduce ? 1 : ease((t - T_S1) / DUR), k2 = reduce ? 1 : ease((t - T_S2) / DUR);
+         var grow = reduce ? 1 : ease((t - T_BARS) / 1.2);
+         var rowA = names.map(function (nm, q) { return q === EVI ? 1 - 0.86 * k1 : (q === LAI ? 1 - 0.86 * k2 : 1); });
+         var v = names.map(function (nm, q) { return lerp(lerp(V0[q], V1[q], k1), V2[q], k2); });
+
+         // column and row names
+         c.fillStyle = TEXT; c.font = '10px ui-monospace, "Cascadia Code", Consolas, monospace';
+         for (i = 0; i < K; i++) {
+            c.globalAlpha = rowA[i]; c.textAlign = 'right'; c.fillText(names[i], x0 - 6, topM + (i + 0.5) * rowH + 3.5);
+            c.save(); c.translate(x0 + (i + 0.5) * rowH + 3.5, topM - 6); c.rotate(-Math.PI / 2); c.textAlign = 'left'; c.fillText(names[i], 0, 0); c.restore();
+            if (rowA[i] < 0.9) { c.strokeStyle = rgba(COL.amber, 0.8 * (1 - rowA[i])); c.lineWidth = 1.2; var wdt = c.measureText(names[i]).width; c.beginPath(); c.moveTo(x0 - 6 - wdt, topM + (i + 0.5) * rowH); c.lineTo(x0 - 6, topM + (i + 0.5) * rowH); c.stroke(); }
+         }
+         c.globalAlpha = 1;
+
+         // correlation matrix: cyan for positive, violet for negative, strength as opacity
+         for (i = 0; i < K; i++) {
+            for (j = 0; j < K; j++) {
+               var delay = (i + j) / (2 * K) * 1.3, a = (reduce ? 1 : ease((t - delay) / 0.45)) * Math.min(rowA[i], rowA[j]);
+               if (a <= 0) { continue; }
+               var r = R[i][j], mag = Math.abs(r), cx = x0 + j * rowH, cy = topM + i * rowH;
+               c.fillStyle = rgba('#0c1a33', a); c.fillRect(cx + 1, cy + 1, rowH - 2, rowH - 2);
+               c.fillStyle = rgba(r >= 0 ? COL.cyan : COL.violet, a * (0.1 + 0.9 * Math.pow(mag, 1.4))); c.fillRect(cx + 1, cy + 1, rowH - 2, rowH - 2);
+               if (i !== j && mag >= 0.8) { c.fillStyle = rgba('#ffffff', 0.92 * a); c.font = '8.5px ui-monospace, Consolas, monospace'; c.textAlign = 'center'; c.fillText(r.toFixed(2), cx + rowH / 2, cy + rowH / 2 + 3); }
             }
          }
-         for (L = 0; L < sizes.length; L++) {
-            var rd = ready(L);
-            for (i = 0; i < sizes[L]; i++) {
-               var v = acts[L][i], strong = Math.abs(v), colr = L === sizes.length - 1 ? (i === 0 ? COL.cyan : COL.amber) : (v >= 0 ? COL.green : COL.violet);
-               c.fillStyle = 'rgba(5,12,26,.96)'; c.beginPath(); c.arc(X(L), Y(L, i), 11, 0, TAU); c.fill();
-               if (rd > 0) { c.fillStyle = rgba(colr, (0.2 + 0.8 * strong) * rd); c.beginPath(); c.arc(X(L), Y(L, i), 8.2, 0, TAU); c.fill(); if (strong > 0.55 && rd > 0.6) { c.shadowColor = rgba(colr, 0.8); c.shadowBlur = 14; c.fill(); c.shadowBlur = 0; } }
-               c.strokeStyle = rgba(colr, 0.8); c.lineWidth = 1.6; c.beginPath(); c.arc(X(L), Y(L, i), 11, 0, TAU); c.stroke();
-            }
+         // the block that moves together
+         var blockA = reduce ? 0 : ease((t - 1.8) / 0.5) * (1 - k1) * (0.65 + 0.35 * Math.sin(t * 6));
+         if (blockA > 0) {
+            c.strokeStyle = rgba(COL.amber, blockA); c.lineWidth = 2; c.shadowColor = rgba(COL.amber, 0.7 * blockA); c.shadowBlur = 10;
+            c.strokeRect(x0 + 0.5, topM + 0.5, 3 * rowH - 1, 3 * rowH - 1); c.shadowBlur = 0;
          }
-         c.fillStyle = TEXT; c.textAlign = 'center';
-         ['input', 'hidden', 'hidden', 'output'].forEach(function (nm, l) { c.fillText(nm, X(l), H - 7); });
-         p.say('in', input.map(function (v) { return v.toFixed(2); }).join(', '));
-         var done = reduce || t >= LEAD + 3 * STAGE;
-         p.say('out', done ? acts[3][0].toFixed(2) + ' / ' + acts[3][1].toFixed(2) : '...');
+
+         // VIF bars, one per row, with the usual limits of 5 and 10
+         c.font = MONO; c.textAlign = 'center'; c.fillStyle = TEXT; c.fillText('VIF', xb + barW / 2, topM - 22);
+         [5, 10].forEach(function (lim) {
+            c.setLineDash([4, 4]); c.strokeStyle = lim === 5 ? rgba(COL.green, 0.55) : rgba('#f87171', 0.6); c.lineWidth = 1;
+            c.beginPath(); c.moveTo(bx(lim), topM - 6); c.lineTo(bx(lim), topM + heatW + 4); c.stroke(); c.setLineDash([]);
+            c.fillStyle = lim === 5 ? COL.green : '#f87171'; c.textAlign = 'center'; c.fillText(String(lim), bx(lim), topM + heatW + 16);
+         });
+         c.strokeStyle = AXIS; c.beginPath(); c.moveTo(xb, topM - 4); c.lineTo(xb, topM + heatW + 4); c.stroke();
+         var worst = 0;
+         for (i = 0; i < K; i++) {
+            var val = v[i] * grow, yc = topM + (i + 0.5) * rowH, col = v[i] < 5 ? COL.green : (v[i] < 10 ? COL.amber : '#f87171');
+            if (v[i] * 1 > worst && rowA[i] > 0.5) { worst = v[i]; }
+            if (val < 0.05) { continue; }
+            c.globalAlpha = Math.max(0.25, rowA[i]);
+            c.fillStyle = rgba(col, 0.9); c.shadowColor = rgba(col, 0.5); c.shadowBlur = 8;
+            c.fillRect(xb + 1, yc - rowH * 0.28, Math.max(1, bx(val) - xb - 1), rowH * 0.56); c.shadowBlur = 0;
+            c.fillStyle = '#e8eefb'; c.textAlign = 'left'; c.fillText(val.toFixed(1), bx(val) + 5, yc + 3.5);
+            c.globalAlpha = 1;
+         }
+         var removed = k2 > 0.5 ? 'EVI, LAI' : (k1 > 0.5 ? 'EVI' : 'none');
+         p.say('removed', removed);
+         p.say('maxvif', t < T_BARS && !reduce ? '--' : worst.toFixed(1));
+         p.say('n', String(K - (k1 > 0.5 ? 1 : 0) - (k2 > 0.5 ? 1 : 0)));
       };
       return p;
    }
@@ -298,7 +340,7 @@
    }
 
    /* ---------- wiring ---------- */
-   var makers = { regression: regression, kmeans: kmeans, network: network, loss: loss };
+   var makers = { regression: regression, kmeans: kmeans, collinearity: collinearity, loss: loss };
    var panels = [], running = false, last = 0;
 
    function frame(now) {
@@ -313,7 +355,7 @@
    [].forEach.call(cards, function (card) {
       var make = makers[card.getAttribute('data-viz')];
       if (!make) { return; }
-      var p = make(card); p.card = card; card._p = p; panels.push(p);
+      var p = make(card); if (!p) { return; } p.card = card; card._p = p; panels.push(p);
       p.resize(); p.reset();
       if (reduce) { settle(p); } else { p.draw(); }
       var btn = card.querySelector('.viz-replay');
