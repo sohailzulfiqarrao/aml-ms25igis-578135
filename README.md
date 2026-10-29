@@ -38,6 +38,9 @@ Assignments/Assignment 2/    Assignment 02: clustering
 
 Each new assignment gets its own folder under `Assignments/` and a new card on the landing page.
 
+The landing page links its own scripts and styles with a version number (`?v=20261030`). Change it when those files
+change, so a browser never pairs a new page with an old cached script.
+
 The "Machine learning, in motion" section runs only while it is on screen and the tab is visible, and with
 `prefers-reduced-motion` each panel is drawn once, in its finished state. The regression is the real NDVI and
 evapotranspiration data (a simple fit on all 87 rows, R² 0.794). The multicollinearity panel computes the correlation
