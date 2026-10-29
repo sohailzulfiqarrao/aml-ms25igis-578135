@@ -25,6 +25,8 @@ assets/ml-viz.js             the shared animation loop and the first four panels
                              multicollinearity, training loss)
 assets/ml-algos.js           nine more: Ward dendrogram, DBSCAN, Gaussian mixture, PCA, over-fitting, k-NN,
                              decision tree, logistic regression, gradient descent
+assets/ml-algos2.js          four more: t-SNE and cross-validation on the real Assignment 1 data, random forest, SVM
+                             (their plain algorithms are in window.MLVIZ_PURE, checkable without a browser)
 assets/ml-data.js            the real Assignment 1 data they use
 assets/motif.svg             animated background art (motif-static.svg is the still copy for reduced motion)
 Assignments/Assignment 1/    Assignment 01: multiple linear regression
@@ -40,7 +42,10 @@ The "Machine learning, in motion" section runs only while it is on screen and th
 `prefers-reduced-motion` each panel is drawn once, in its finished state. The regression is the real NDVI and
 evapotranspiration data (a simple fit on all 87 rows, R² 0.794). The multicollinearity panel computes the correlation
 matrix and the VIFs from the same file, with the report's IQR capping, and reproduces the report: removing EVI and then
-LAI takes every VIF below 5. PCA uses the same eight predictors (PC1 58.1%, PC2 18.5%). The other panels are illustrations on made-up
+LAI takes every VIF below 5. PCA uses the same eight predictors (PC1 58.1%, PC2 18.5%). t-SNE maps the 87 observations to two dimensions
+(a point's 5 nearest neighbours share its evapotranspiration tercile 74% of the time, as in the original eight
+dimensions). The cross-validation panel refits the six-predictor regression on the report's five folds and reproduces
+the five scores (0.7853, 0.5992, 0.7009, 0.8528, 0.6833; mean 0.7243). The other panels are illustrations on made-up
 point clouds with fixed seeds; each algorithm is nonetheless run for real. The filter chips show one family at a time.
 
 ## Python on GitHub

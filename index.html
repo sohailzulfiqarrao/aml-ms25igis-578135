@@ -39,14 +39,14 @@
       <div class="viz-head">
          <p class="viz-kicker">// live</p>
          <h2 id="viz-title">Machine learning, in motion</h2>
-         <p class="section-note">Thirteen algorithms running in your browser, each one computed live by the code that draws it. The regression, multicollinearity and PCA panels use the real data of Assignment 1; the others use made-up point clouds.</p>
+         <p class="section-note">Seventeen algorithms running in your browser, each one computed live by the code that draws it. The regression, multicollinearity, PCA, t-SNE and cross-validation panels use the real data of Assignment 1; the others use made-up point clouds.</p>
       </div>
       <div class="viz-filter" role="group" aria-label="Show algorithms by family">
-         <button class="viz-chip" type="button" data-filter="all" aria-pressed="true">All<small>13</small></button>
+         <button class="viz-chip" type="button" data-filter="all" aria-pressed="true">All<small>17</small></button>
          <button class="viz-chip" type="button" data-filter="clustering" aria-pressed="false">Clustering<small>4</small></button>
-         <button class="viz-chip" type="button" data-filter="regression" aria-pressed="false">Regression and data<small>4</small></button>
-         <button class="viz-chip" type="button" data-filter="classification" aria-pressed="false">Classification<small>3</small></button>
-         <button class="viz-chip" type="button" data-filter="training" aria-pressed="false">Training<small>2</small></button>
+         <button class="viz-chip" type="button" data-filter="regression" aria-pressed="false">Regression and data<small>5</small></button>
+         <button class="viz-chip" type="button" data-filter="classification" aria-pressed="false">Classification<small>5</small></button>
+         <button class="viz-chip" type="button" data-filter="training" aria-pressed="false">Training and validation<small>3</small></button>
       </div>
       <div class="viz-grid">
 
@@ -247,6 +247,69 @@
             <p class="viz-note">The same narrow valley, three ways down. Plain gradient descent zigzags across the steep walls, momentum builds speed along the floor and arrives first, and Adam takes the smoothest path. The numbers are the loss.</p>
          </figure>
 
+         <figure class="viz-card" data-viz="tsne" data-cat="regression">
+            <figcaption class="viz-top">
+               <span class="viz-name">t-SNE</span>
+               <span class="viz-tag viz-real">Assignment 1 data</span>
+               <button class="viz-replay" type="button" aria-label="Replay the t-sne animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: the 87 observations of Assignment 1 start as one tangle of points and spread out into a two dimensional map in which similar observations sit together, coloured by evapotranspiration"></canvas>
+            <p class="viz-stats">
+               <span>iteration <b data-s="iter">0</b></span>
+               <span>KL divergence <b data-s="kl">--</b></span>
+               <span>same-colour neighbours <b data-s="same">--</b></span>
+               <span><b data-s="phase">exaggerating</b></span>
+            </p>
+            <p class="viz-note">The 87 observations, described by the eight predictors, are mapped to two dimensions so that near neighbours stay near. Colour is evapotranspiration, which t-SNE never sees: a point&rsquo;s 5 nearest neighbours share its colour 74% of the time, as in the original eight dimensions (31% for a random map).</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="forest" data-cat="classification">
+            <figcaption class="viz-top">
+               <span class="viz-name">Random forest</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the random forest animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: decision trees are added one at a time to a forest, and the shaded decision regions become smoother while the held-out accuracy rises"></canvas>
+            <p class="viz-stats">
+               <span>trees <b data-s="trees">0/24</b></span>
+               <span>this tree <b data-s="tree">--</b></span>
+               <span>forest <b data-s="forest">--</b></span>
+               <span>average single tree <b data-s="avg">--</b></span>
+            </p>
+            <p class="viz-note">Each tree learns from a bootstrap sample and picks one random feature per split, so the trees disagree and their regions are blocky. The vote of all 24 smooths the boundary and beats a typical single tree on the held-out points (rings).</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="svm" data-cat="classification">
+            <figcaption class="viz-top">
+               <span class="viz-name">Support vector machine</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the support vector machine animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: a straight decision boundary with a margin around it is trained on two classes of points, then the margin widens as the penalty C is lowered"></canvas>
+            <p class="viz-stats">
+               <span><b data-s="c">training...</b></span>
+               <span>margin <b data-s="margin">--</b></span>
+               <span>support vectors <b data-s="sv">--</b></span>
+               <span>accuracy <b data-s="acc">--</b></span>
+            </p>
+            <p class="viz-note">Only the points on or inside the margin (ringed) decide the boundary. A large C punishes every violation and gives a narrow margin; a small C tolerates some and gives a wider one. Trained by SMO, as in LIBSVM.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="cv" data-cat="training">
+            <figcaption class="viz-top">
+               <span class="viz-name">Cross-validation (5 folds)</span>
+               <span class="viz-tag viz-real">Assignment 1 data</span>
+               <button class="viz-replay" type="button" aria-label="Replay the cross-validation (5 folds) animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: the 87 observations are split into five folds and in each round a regression is fitted on four folds and scored on the fifth, building up five R squared bars and their mean"></canvas>
+            <p class="viz-stats">
+               <span>round <b data-s="round">0/5</b></span>
+               <span>fold R&sup2; <b data-s="fold">--</b></span>
+               <span>running mean <b data-s="mean">--</b></span>
+            </p>
+            <p class="viz-note">The Assignment 1 regression (six predictors, shuffled with seed 42), refitted live in your browser. Each round holds out a different fold; the five scores and their mean are the ones in the report.</p>
+         </figure>
+
       </div>
    </section>
 
@@ -333,6 +396,7 @@
 
 <script src="assets/ml-data.js"></script>
 <script src="assets/ml-algos.js" defer></script>
+<script src="assets/ml-algos2.js" defer></script>
 <script src="assets/ml-viz.js" defer></script>
 
 </body>

@@ -349,10 +349,12 @@
 
    /* ---------- wiring ---------- */
    var makers = { regression: regression, kmeans: kmeans, collinearity: collinearity, loss: loss };
-   if (typeof window.MLVIZ_EXTRA === 'function') {                                     // the other algorithms, from ml-algos.js
-      var extra = window.MLVIZ_EXTRA({ base: base, rng: rng, gauss: gauss, clamp: clamp, ease: ease, easeIO: easeIO, lerp: lerp, mean: mean, rgba: rgba, COL: COL, TAU: TAU, TEXT: TEXT, GRID: GRID, AXIS: AXIS, MONO: MONO, reduce: reduce });
+   ['MLVIZ_EXTRA', 'MLVIZ_EXTRA2'].forEach(function (name) {                                // the other algorithms, from ml-algos.js and ml-algos2.js
+      if (typeof window[name] !== 'function') { return; }
+      var extra = window[name]({ base: base, rng: rng, gauss: gauss, clamp: clamp, ease: ease, easeIO: easeIO, lerp: lerp, mean: mean, rgba: rgba, COL: COL, TAU: TAU, TEXT: TEXT, GRID: GRID, AXIS: AXIS, MONO: MONO, reduce: reduce });
       Object.keys(extra).forEach(function (k) { makers[k] = extra[k]; });
-   }
+   });
+
    var panels = [], running = false, last = 0;
 
    function frame(now) {
