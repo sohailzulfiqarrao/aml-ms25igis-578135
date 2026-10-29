@@ -3,11 +3,18 @@
      kmeans      Lloyd's algorithm on three clouds of points (an illustration)
      collinearity the correlation matrix and VIF pruning of Assignment 1: drop EVI, then LAI (real data)
      loss        training and validation loss with early stopping (an illustration)
+   The other algorithms (dendrogram, DBSCAN, Gaussian mixture, PCA, over-fitting, k-NN, decision tree, logistic regression,
+   gradient descent) live in ml-algos.js and are mounted here.
    Every number on screen is computed by the code that draws it. A panel animates only while it is on screen and
    the tab is visible; with prefers-reduced-motion each panel is drawn once, in its finished state. */
 (function () {
    'use strict';
    var DATA = window.ML_NDVI_ET;
+   // the animated background art plays only near the top of the page (see .bg-still in neural.css)
+   var bgTick = false;
+   function bgState() { bgTick = false; document.body.classList.toggle('bg-still', window.scrollY > 160); }
+   window.addEventListener('scroll', function () { if (!bgTick) { bgTick = true; requestAnimationFrame(bgState); } }, { passive: true });
+   bgState();
    var cards = document.querySelectorAll('.viz-card');
    if (!cards.length || !DATA) { return; }
 
@@ -29,6 +36,7 @@
    function gauss(r) { var u = 0; while (u === 0) { u = r(); } return Math.sqrt(-2 * Math.log(u)) * Math.cos(TAU * r()); }
    function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
    function ease(t) { return 1 - Math.pow(1 - clamp(t, 0, 1), 3); }
+   function easeIO(t) { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
    function mean(a) { var s = 0; for (var i = 0; i < a.length; i++) { s += a[i]; } return s / a.length; }
    function lerp(a, b, t) { return a + (b - a) * t; }
    function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
@@ -341,13 +349,17 @@
 
    /* ---------- wiring ---------- */
    var makers = { regression: regression, kmeans: kmeans, collinearity: collinearity, loss: loss };
+   if (typeof window.MLVIZ_EXTRA === 'function') {                                     // the other algorithms, from ml-algos.js
+      var extra = window.MLVIZ_EXTRA({ base: base, rng: rng, gauss: gauss, clamp: clamp, ease: ease, easeIO: easeIO, lerp: lerp, mean: mean, rgba: rgba, COL: COL, TAU: TAU, TEXT: TEXT, GRID: GRID, AXIS: AXIS, MONO: MONO, reduce: reduce });
+      Object.keys(extra).forEach(function (k) { makers[k] = extra[k]; });
+   }
    var panels = [], running = false, last = 0;
 
    function frame(now) {
       var dt = (now - last) / 1000, any = false;
       if (!(dt > 0)) { dt = 0.016; } if (dt > 0.05) { dt = 0.05; }   // a frame stamp can precede the start time: never step backwards
       last = now;
-      panels.forEach(function (p) { if (p.visible) { any = true; p.update(dt); p.draw(); } });
+      panels.forEach(function (p) { if (p.visible && !p.card.hidden) { any = true; p.update(dt); p.draw(); } });
       if (any && !document.hidden) { requestAnimationFrame(frame); } else { running = false; }
    }
    function kick() { if (!running && !reduce && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(frame); } }
@@ -378,8 +390,24 @@
    }
    document.addEventListener('visibilitychange', function () { if (!document.hidden) { kick(); } });
 
+   // filter chips: show one family of algorithms; a hidden card is off screen, so it stops animating
+   var chips = document.querySelectorAll('.viz-chip');
+   [].forEach.call(chips, function (chip) {
+      chip.addEventListener('click', function () {
+         var cat = chip.getAttribute('data-filter');
+         [].forEach.call(cards, function (cd) {
+            var was = cd.hidden; cd.hidden = !(cat === 'all' || cd.getAttribute('data-cat') === cat);
+            if (was && !cd.hidden && cd._p) { cd._p.resize(); cd._p.draw(); if (cd._p.visible) { kick(); } }
+         });
+         [].forEach.call(chips, function (ch) { ch.setAttribute('aria-pressed', String(ch === chip)); });
+      });
+   });
+
    var timer;
-   function relayout() { clearTimeout(timer); timer = setTimeout(function () { panels.forEach(function (p) { p.resize(); p.draw(); }); }, 100); }
+   function relayout() {
+      clearTimeout(timer);
+      timer = setTimeout(function () { panels.forEach(function (p) { if (p.card.hidden) { return; } p.resize(); p.draw(); }); }, 100);   // a card hidden by a filter chip has no size: leave it alone
+   }
    if ('ResizeObserver' in window) { panels.forEach(function (p) { new ResizeObserver(relayout).observe(p.canvas); }); }
    else { window.addEventListener('resize', relayout); }
 })();

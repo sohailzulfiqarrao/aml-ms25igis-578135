@@ -162,7 +162,7 @@ body.neural::after {
    inset: 0;
    z-index: -1;
    pointer-events: none;
-   background: url("motif.svg") right top / cover no-repeat;
+   background: url("motif-fx.svg") right top / cover no-repeat, url("motif.svg") right top / cover no-repeat;
    opacity: .85;
    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
    mask-image: linear-gradient(180deg, #000 0%, #000 55%, transparent 100%);
@@ -197,9 +197,21 @@ body.neural .viz-stats span { white-space: nowrap; }
 body.neural .viz-stats b { color: var(--vz); font-weight: 700; font-variant-numeric: tabular-nums; }
 body.neural .viz-note { margin: 0; padding: 2px 14px 14px; font-size: 13px; line-height: 1.5; color: #8296b4; }
 @media (max-width: 760px) { body.neural .viz-grid { grid-template-columns: 1fr; } }
+/* once the visitor has scrolled past the top, the background art stops moving so that the panels run smoothly */
+body.neural.bg-still::after { background-image: url("motif.svg"); }
 @media (prefers-reduced-motion: reduce) {
    body.neural .viz-replay { display: none; }
-   body.neural::after { background-image: url("motif-static.svg"); }
+   body.neural::after, body.neural.bg-still::after { background-image: url("motif-static.svg"); }
 }
 
 body.neural .viz-stats code, body.neural .viz-note code { font-family: var(--mono); font-size: .92em; color: #c4d4ea; }
+
+/* ---- filter chips for the algorithm families ---- */
+body.neural .viz-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+body.neural .viz-chip { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; font: inherit; font-family: var(--mono); font-size: 12.5px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; cursor: pointer; transition: color .2s, border-color .2s, background .2s, transform .2s; }
+body.neural .viz-chip small { padding: 1px 7px; font-size: 11px; color: var(--muted); background: rgba(148, 163, 184, .16); border-radius: 999px; }
+body.neural .viz-chip:hover { color: var(--ink); border-color: rgba(var(--vz-rgb), .6); transform: translateY(-1px); }
+body.neural .viz-chip:focus-visible { outline: 2px solid var(--g1); outline-offset: 2px; }
+body.neural .viz-chip[aria-pressed="true"] { color: #04101e; font-weight: 700; background: linear-gradient(120deg, var(--g1), var(--g2)); border-color: transparent; }
+body.neural .viz-chip[aria-pressed="true"] small { color: #04101e; background: rgba(4, 16, 30, .18); }
+body.neural .viz-card[hidden] { display: none; }
