@@ -39,11 +39,18 @@
       <div class="viz-head">
          <p class="viz-kicker">// live</p>
          <h2 id="viz-title">Machine learning, in motion</h2>
-         <p class="section-note">Four small models running in your browser. The regression and the multicollinearity panels use the real data of Assignment 1; the other two are illustrations.</p>
+         <p class="section-note">Thirteen algorithms running in your browser, each one computed live by the code that draws it. The regression, multicollinearity and PCA panels use the real data of Assignment 1; the others use made-up point clouds.</p>
+      </div>
+      <div class="viz-filter" role="group" aria-label="Show algorithms by family">
+         <button class="viz-chip" type="button" data-filter="all" aria-pressed="true">All<small>13</small></button>
+         <button class="viz-chip" type="button" data-filter="clustering" aria-pressed="false">Clustering<small>4</small></button>
+         <button class="viz-chip" type="button" data-filter="regression" aria-pressed="false">Regression and data<small>4</small></button>
+         <button class="viz-chip" type="button" data-filter="classification" aria-pressed="false">Classification<small>3</small></button>
+         <button class="viz-chip" type="button" data-filter="training" aria-pressed="false">Training<small>2</small></button>
       </div>
       <div class="viz-grid">
 
-         <figure class="viz-card" data-viz="regression">
+         <figure class="viz-card" data-viz="regression" data-cat="regression">
             <figcaption class="viz-top">
                <span class="viz-name">Linear regression</span>
                <span class="viz-tag viz-real">Assignment 1 data</span>
@@ -58,7 +65,7 @@
             <p class="viz-note">Gradient descent on NDVI alone, all 87 rows. The report&rsquo;s test R&sup2; of 0.785 uses six predictors and a held-out set.</p>
          </figure>
 
-         <figure class="viz-card" data-viz="kmeans">
+         <figure class="viz-card" data-viz="kmeans" data-cat="clustering">
             <figcaption class="viz-top">
                <span class="viz-name">K-means clustering</span>
                <span class="viz-tag">illustration</span>
@@ -73,7 +80,7 @@
             <p class="viz-note">Assign every point to its nearest centroid, move each centroid to the mean of its points, repeat until nothing changes.</p>
          </figure>
 
-         <figure class="viz-card" data-viz="collinearity">
+         <figure class="viz-card" data-viz="collinearity" data-cat="regression">
             <figcaption class="viz-top">
                <span class="viz-name">Multicollinearity (VIF)</span>
                <span class="viz-tag viz-real">Assignment 1 data</span>
@@ -88,7 +95,7 @@
             <p class="viz-note">VIF = 1 &divide; (1 &minus; R&sup2;) of each predictor regressed on the others. NDVI, EVI and LAI move together (r 0.88&ndash;0.95), so the report drops EVI, then LAI: every VIF ends below 5.</p>
          </figure>
 
-         <figure class="viz-card" data-viz="loss">
+         <figure class="viz-card" data-viz="loss" data-cat="training">
             <figcaption class="viz-top">
                <span class="viz-name">Training and validation loss</span>
                <span class="viz-tag">illustration</span>
@@ -101,6 +108,143 @@
                <span>val <b data-s="val">--</b></span>
             </p>
             <p class="viz-note">Validation loss turns up while training loss still falls: the model starts to overfit, so training stops at the best epoch.</p>
+         </figure>
+
+
+         <figure class="viz-card" data-viz="dendrogram" data-cat="clustering">
+            <figcaption class="viz-top">
+               <span class="viz-name">Hierarchical clustering (Ward)</span>
+               <span class="viz-tag">Assignment 2 method</span>
+               <button class="viz-replay" type="button" aria-label="Replay the hierarchical clustering (ward) animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: the closest clusters are merged one pair at a time, and each merge is drawn as a branch of a dendrogram that is finally cut into three clusters"></canvas>
+            <p class="viz-stats">
+               <span>merges <b data-s="merges">0/23</b></span>
+               <span>height <b data-s="height">--</b></span>
+               <span>clusters <b data-s="clusters">24</b></span>
+            </p>
+            <p class="viz-note">Ward linkage: always merge the two clusters whose union adds the least variance. The dendrogram records every merge and its height; cutting it at one height gives k clusters.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="dbscan" data-cat="clustering">
+            <figcaption class="viz-top">
+               <span class="viz-name">DBSCAN</span>
+               <span class="viz-tag">Assignment 2 method</span>
+               <button class="viz-replay" type="button" aria-label="Replay the dbscan animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: DBSCAN grows two moon-shaped clusters by following dense neighbourhoods, and marks isolated points as noise"></canvas>
+            <p class="viz-stats">
+               <span>clusters <b data-s="clusters">0</b></span>
+               <span>noise <b data-s="noise">0</b></span>
+               <span><b data-s="params">eps 0.07 &middot; min 5</b></span>
+            </p>
+            <p class="viz-note">A point with enough neighbours inside the dashed circle is a core point and its cluster spreads through them. K-means cannot separate these two moons; density can. Grey points are noise.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="gmm" data-cat="clustering">
+            <figcaption class="viz-top">
+               <span class="viz-name">Gaussian mixture (EM)</span>
+               <span class="viz-tag">Assignment 2 method</span>
+               <button class="viz-replay" type="button" aria-label="Replay the gaussian mixture (em) animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: three ellipses start on top of each other and, step by step, stretch and move until each one fits one cloud of points"></canvas>
+            <p class="viz-stats">
+               <span>iteration <b data-s="iter">0</b></span>
+               <span>log-likelihood <b data-s="ll">--</b></span>
+               <span><b data-s="state">E step, M step</b></span>
+            </p>
+            <p class="viz-note">Expectation maximisation: each point gets a soft share in every component (the colour mix), then each component is refitted to its points. The log-likelihood only ever rises.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="pca" data-cat="regression">
+            <figcaption class="viz-top">
+               <span class="viz-name">Principal components (PCA)</span>
+               <span class="viz-tag viz-real">Assignment 1 data</span>
+               <button class="viz-replay" type="button" aria-label="Replay the principal components (pca) animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: bars show how much of the variance of the eight predictors each principal component explains, then the loadings of the first two components"></canvas>
+            <p class="viz-stats">
+               <span>PC1 <b data-s="pc1">--</b></span>
+               <span>PC1 + PC2 <b data-s="pc2">--</b></span>
+               <span>components for 90% <b data-s="n90">--</b></span>
+            </p>
+            <p class="viz-note">PCA of the same eight predictors, standardised. PC1 holds the NDVI, EVI and LAI group that the VIF step found collinear: the same redundancy, seen as one axis.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="overfit" data-cat="regression">
+            <figcaption class="viz-top">
+               <span class="viz-name">Under- and over-fitting</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the under- and over-fitting animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: polynomials of rising degree are fitted to noisy points, and the test error falls and then rises again"></canvas>
+            <p class="viz-stats">
+               <span>degree <b data-s="degree">1</b></span>
+               <span>train error <b data-s="train">--</b></span>
+               <span>test error <b data-s="test">--</b></span>
+               <span><b data-s="verdict">underfit</b></span>
+            </p>
+            <p class="viz-note">A higher degree always fits the 14 training points better, but past a point the curve chases noise and the error on new points climbs. Test error picks the right complexity.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="knn" data-cat="classification">
+            <figcaption class="viz-top">
+               <span class="viz-name">k-nearest neighbours</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the k-nearest neighbours animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: a query point moves across two classes of points, takes a vote among its k nearest neighbours, and the decision regions change with k"></canvas>
+            <p class="viz-stats">
+               <span>k <b data-s="k">1</b></span>
+               <span>votes <b data-s="votes">--</b></span>
+               <span><b data-s="pred">--</b></span>
+            </p>
+            <p class="viz-note">The query takes the majority class of its k nearest neighbours (the dashed circle). A small k gives ragged, noise-sensitive regions; a larger k smooths them.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="tree" data-cat="classification">
+            <figcaption class="viz-top">
+               <span class="viz-name">Decision tree</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the decision tree animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: a decision tree is grown one split at a time, each split a line that divides the points more cleanly, with the tree drawn beside it"></canvas>
+            <p class="viz-stats">
+               <span>splits <b data-s="splits">0/0</b></span>
+               <span>depth <b data-s="depth">0</b></span>
+               <span>accuracy <b data-s="acc">--</b></span>
+            </p>
+            <p class="viz-note">Greedy and axis-aligned: each step picks the one threshold on x or y that lowers the Gini impurity most. One split on x and one on y do the real work; the last only picks off a stray point.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="logistic" data-cat="classification">
+            <figcaption class="viz-top">
+               <span class="viz-name">Logistic regression</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the logistic regression animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: a straight decision boundary rotates and shifts by gradient descent until it separates the two classes, with the probability shading following it"></canvas>
+            <p class="viz-stats">
+               <span>step <b data-s="step">0</b></span>
+               <span>log loss <b data-s="loss">--</b></span>
+               <span>accuracy <b data-s="acc">--</b></span>
+            </p>
+            <p class="viz-note">The shading is the predicted probability of the violet class and the white line is where it equals one half. Gradient descent on the log loss moves the line.</p>
+         </figure>
+
+         <figure class="viz-card" data-viz="gd" data-cat="training">
+            <figcaption class="viz-top">
+               <span class="viz-name">Gradient descent, momentum, Adam</span>
+               <span class="viz-tag">illustration</span>
+               <button class="viz-replay" type="button" aria-label="Replay the gradient descent, momentum, adam animation">&#8635;</button>
+            </figcaption>
+            <canvas role="img" aria-label="Animation: three optimisers roll down the same narrow valley of a loss surface from the same start, each leaving a trail"></canvas>
+            <p class="viz-stats">
+               <span>GD <b data-s="gd">--</b></span>
+               <span>momentum <b data-s="mom">--</b></span>
+               <span>Adam <b data-s="adam">--</b></span>
+            </p>
+            <p class="viz-note">The same narrow valley, three ways down. Plain gradient descent zigzags across the steep walls, momentum builds speed along the floor and arrives first, and Adam takes the smoothest path. The numbers are the loss.</p>
          </figure>
 
       </div>
@@ -188,6 +332,7 @@
 </footer>
 
 <script src="assets/ml-data.js"></script>
+<script src="assets/ml-algos.js" defer></script>
 <script src="assets/ml-viz.js" defer></script>
 
 </body>
